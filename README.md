@@ -1,0 +1,4 @@
+scripty
+=======
+
+Easy sysadmin!
