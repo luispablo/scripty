@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:19.+'
     compile files('libs/guice-3.0-no_aop.jar', 'libs/roboguice-2.0.jar', 'libs/javax.inject-1.jar')
     compile 'org.roboguice:roboguice:2.0@jar'
+    compile 'com.squareup.retrofit:retrofit:1.5.1'
 }

@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.inject.Inject;
 
 import org.apache.http.HttpResponse;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit.RestAdapter;
 import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
 
@@ -61,38 +63,30 @@ public class SendValidationTask extends RoboAsyncTask<Void> {
     }
 
     private void createDevice(String userId) throws IOException {
-        String url = (SCRIPTY_SERVER_URL + CREATE_DEVICE_URI).replace(":id", userId);
-        HttpPost post = new HttpPost(url);
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("device[user_id]", userId));
-        post.setEntity(new UrlEncodedFormEntity(pairs));
-        HttpResponse response = new DefaultHttpClient().execute(post);
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
+        ScriptyService service = restAdapter.create(ScriptyService.class);
+        service.createDevice(userId);
     }
 
     private String createUser(String email) throws IOException, JSONException {
-        HttpPost post = new HttpPost(SCRIPTY_SERVER_URL + USER_URI);
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("user[email]", email));
-        post.setEntity(new UrlEncodedFormEntity(pairs));
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
+        ScriptyService service = restAdapter.create(ScriptyService.class);
+        LinkedTreeMap response = service.createUser(email);
 
-        HttpResponse response = new DefaultHttpClient().execute(post);
-        JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
-
-        return json.getString("id");
+        if (response != null) {
+            return String.valueOf(((Double) response.get("id")).intValue());
+        } else {
+            return null;
+        }
     }
 
     private String findUserId(String email) throws IOException, JSONException {
-        HttpPost post = new HttpPost(SCRIPTY_SERVER_URL + FIND_USER_URI);
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("email", email));
-        post.setEntity(new UrlEncodedFormEntity(pairs));
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
+        ScriptyService service = restAdapter.create(ScriptyService.class);
+        LinkedTreeMap response = service.findUserByEmail(email);
 
-        HttpResponse response = new DefaultHttpClient().execute(post);
-        String responseText = EntityUtils.toString(response.getEntity());
-
-        if (responseText != null && !responseText.equals("null")) {
-            JSONObject json = new JSONObject(responseText);
-            return json.getString("id");
+        if (response != null) {
+            return String.valueOf(((Double) response.get("id")).intValue());
         } else {
             return null;
         }

@@ -39,6 +39,12 @@ public class SignInActivity extends RoboActivity {
                         Toast.makeText(SignInActivity.this, "ERROR: "+ e.getMessage(), Toast.LENGTH_SHORT).show();
                         Ln.e(e);
                     }
+
+                    @Override
+                    protected void onSuccess(Void aVoid) throws Exception {
+                        super.onSuccess(aVoid);
+                    }
+
                     @Override
                     protected void onFinally() {
                         if (dialog.isShowing()) dialog.dismiss();
