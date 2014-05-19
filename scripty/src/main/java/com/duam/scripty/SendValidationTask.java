@@ -9,6 +9,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.inject.Inject;
 
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
 
@@ -63,10 +67,16 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
     }
 
     private Device createDevice(String userId) throws IOException {
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(SCRIPTY_SERVER_URL).setConverter(new GsonConverter(gson)).build();
+
         ScriptyService service = restAdapter.create(ScriptyService.class);
 
-        return service.createDevice(userId);
+        return service.createDevice(userId, userId);
     }
 
     private String createUser(String email) throws IOException, JSONException {

@@ -46,6 +46,8 @@ public class SignInActivity extends RoboActivity {
                     protected void onSuccess(Device device) throws Exception {
                         super.onSuccess(device);
 
+                        Ln.d("Storing device with id "+ device.getId() +" and key "+ device.getKey());
+                        
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putLong("deviceId", device.getId());
