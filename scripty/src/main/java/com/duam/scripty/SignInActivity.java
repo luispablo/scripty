@@ -2,7 +2,9 @@ package com.duam.scripty;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,8 +43,16 @@ public class SignInActivity extends RoboActivity {
                     }
 
                     @Override
-                    protected void onSuccess(Void aVoid) throws Exception {
-                        super.onSuccess(aVoid);
+                    protected void onSuccess(Device device) throws Exception {
+                        super.onSuccess(device);
+
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putLong("deviceId", device.getId());
+                        editor.putString("deviceKey", device.getKey());
+                        editor.putBoolean("deviceChecked", false);
+
+                        Toast.makeText(SignInActivity.this, "Validation mail sent. Please check your inbox to start using Scripty!", Toast.LENGTH_LONG).show();
                     }
 
                     @Override

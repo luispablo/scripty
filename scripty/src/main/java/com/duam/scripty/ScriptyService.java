@@ -21,5 +21,5 @@ public interface ScriptyService {
 
     @FormUrlEncoded
     @POST("/users/{id}/devices.json")
-    LinkedTreeMap createDevice(@Path("id") @Field("device[user_id]") String userId);
+    Device createDevice(@Path("id") @Field("device[user_id]") String userId);
 }

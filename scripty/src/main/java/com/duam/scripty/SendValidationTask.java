@@ -34,7 +34,7 @@ import roboguice.util.RoboAsyncTask;
 /**
  * Created by luispablo on 11/05/14.
  */
-public class SendValidationTask extends RoboAsyncTask<Void> {
+public class SendValidationTask extends RoboAsyncTask<Device> {
 
     protected ProgressDialog dialog;
 
@@ -47,25 +47,26 @@ public class SendValidationTask extends RoboAsyncTask<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Device call() throws Exception {
         String userId = findUserId(email);
-        Ln.d("Found user_id: ["+ userId +"]");
+        Device device = null;
 
         if (userId == null || userId.trim().length() == 0) userId = createUser(email);
 
         if (userId == null || userId.trim().length() == 0) {
             throw new RuntimeException("Something's wrong... Cannot find nor create the user.");
         } else {
-            createDevice(userId);
+            device = createDevice(userId);
         }
 
-        return null;
+        return device;
     }
 
-    private void createDevice(String userId) throws IOException {
+    private Device createDevice(String userId) throws IOException {
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
         ScriptyService service = restAdapter.create(ScriptyService.class);
-        service.createDevice(userId);
+
+        return service.createDevice(userId);
     }
 
     private String createUser(String email) throws IOException, JSONException {
