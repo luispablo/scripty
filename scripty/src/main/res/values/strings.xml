@@ -7,5 +7,8 @@
     <string name="please_sign_in">You only need an e-mail address, whether you have a Scripty account or not!</string>
     <string name="sign_in">Sign In</string>
     <string name="email">e-mail</string>
+    <string name="ask_download_servers">You don't have any servers in this device. Do you want to download them from your account?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 
 </resources>

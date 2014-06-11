@@ -1,7 +1,12 @@
 package com.duam.scripty;
 
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,6 +27,8 @@ public class SignInActivity extends RoboActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        checkValidation();
 
         final EditText editEmail = (EditText) findViewById(R.id.editEmail);
 
@@ -50,9 +57,9 @@ public class SignInActivity extends RoboActivity {
 
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putLong("deviceId", device.getId());
-                        editor.putString("deviceKey", device.getKey());
-                        editor.putBoolean("deviceChecked", false);
+                        editor.putLong(PREF_DEVICE_ID, device.getId());
+                        editor.putString(PREF_DEVICE_KEY, device.getKey());
+                        editor.putBoolean(PREF_DEVICE_CHECKED, false);
 
                         Toast.makeText(SignInActivity.this, "Validation mail sent. Please check your inbox to start using Scripty!", Toast.LENGTH_LONG).show();
                     }
@@ -64,6 +71,29 @@ public class SignInActivity extends RoboActivity {
                 }.execute();
             }
         });
+    }
+
+    private void checkValidation() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
+
+        if (prefs.contains(PREF_DEVICE_CHECKED)) {
+            if (prefs.getBoolean(PREF_DEVICE_CHECKED, false)) {
+                startActivity(new Intent(SignInActivity.this, CommandsActivity.class));
+            } else {
+                long deviceId = prefs.getLong(PREF_DEVICE_ID, -1);
+
+                new CheckValidationTask(SignInActivity.this, deviceId) {
+                    @Override
+                    protected void onSuccess(Boolean checked) throws Exception {
+                        super.onSuccess(checked);
+
+                        if (checked) {
+                            startActivity(new Intent(SignInActivity.this, CommandsActivity.class));
+                        }
+                    }
+                }.execute();
+            }
+        }
     }
 
     @Override

@@ -7,6 +7,15 @@ public class Device {
     private long id;
     private String key;
     private long userId;
+    private boolean emailChecked;
+
+    public boolean isEmailChecked() {
+        return emailChecked;
+    }
+
+    public void setEmailChecked(boolean emailChecked) {
+        this.emailChecked = emailChecked;
+    }
 
     public Device() {
 

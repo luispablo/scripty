@@ -26,6 +26,9 @@ public interface ScriptyService {
     @POST("/users/{id}/devices.json")
     Device createDevice(@Path("id") String id, @Field("device[user_id]") String userId);
 
+    @GET("/devices/{id}.json")
+    Device getDevice(@Path("id") long deviceId);
+
     @GET("/users/{id}/servers.json")
     List<Server> getServers(@Path("id") long userId);
 
