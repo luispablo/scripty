@@ -12,4 +12,5 @@ public class ScriptyConstants {
     public static final String PREF_DEVICE_ID = "deviceId";
     public static final String PREF_DEVICE_KEY = "deviceKey";
     public static final String PREF_DEVICE_CHECKED = "deviceChecked";
+    public static final String PREF_USER_ID = "userId";
 }

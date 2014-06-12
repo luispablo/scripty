@@ -44,4 +44,8 @@ public class Device {
     public void setUserId(long userId) {
         this.userId = userId;
     }
+
+    public String describe() {
+        return "id: "+ this.id +" - key: "+ this.key +" - userId: "+ this.userId +" - emailChecked: "+ this.emailChecked;
+    }
 }

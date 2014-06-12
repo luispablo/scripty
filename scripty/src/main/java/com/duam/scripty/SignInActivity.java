@@ -3,6 +3,7 @@ package com.duam.scripty;
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
+import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,13 +23,17 @@ import roboguice.util.Ln;
 
 
 public class SignInActivity extends RoboActivity {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkValidation();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
-        checkValidation();
 
         final EditText editEmail = (EditText) findViewById(R.id.editEmail);
 
@@ -60,6 +65,8 @@ public class SignInActivity extends RoboActivity {
                         editor.putLong(PREF_DEVICE_ID, device.getId());
                         editor.putString(PREF_DEVICE_KEY, device.getKey());
                         editor.putBoolean(PREF_DEVICE_CHECKED, false);
+                        editor.putLong(PREF_USER_ID, device.getUserId());
+                        editor.commit();
 
                         Toast.makeText(SignInActivity.this, "Validation mail sent. Please check your inbox to start using Scripty!", Toast.LENGTH_LONG).show();
                     }
@@ -77,9 +84,12 @@ public class SignInActivity extends RoboActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
 
         if (prefs.contains(PREF_DEVICE_CHECKED)) {
+            Ln.d("The deviceChecked pref exists");
             if (prefs.getBoolean(PREF_DEVICE_CHECKED, false)) {
+                Ln.d("Already checked. Redirecting!");
                 startActivity(new Intent(SignInActivity.this, CommandsActivity.class));
             } else {
+                Ln.d("Not checked yet. Calling server to check...");
                 long deviceId = prefs.getLong(PREF_DEVICE_ID, -1);
 
                 new CheckValidationTask(SignInActivity.this, deviceId) {
@@ -87,12 +97,15 @@ public class SignInActivity extends RoboActivity {
                     protected void onSuccess(Boolean checked) throws Exception {
                         super.onSuccess(checked);
 
+                        Ln.d("Server said: "+ checked);
                         if (checked) {
                             startActivity(new Intent(SignInActivity.this, CommandsActivity.class));
                         }
                     }
                 }.execute();
             }
+        } else {
+            Ln.d("The deviceChecked pref does not exist.");
         }
     }
 

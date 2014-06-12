@@ -16,15 +16,15 @@ public class ScriptyHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "scripty_db";
 
-    private static final String SERVERS_TABLE_NAME = "servers";
-    private static final String ID = "_id";
-    private static final String USER_ID = "user_id";
-    private static final String DESCRIPTION = "description";
-    private static final String ADDRESS = "address";
-    private static final String PORT = "port";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-    private static final String SERVERS_TABLE_CREATE =
+    public static final String SERVERS_TABLE_NAME = "servers";
+    public static final String ID = "_id";
+    public static final String USER_ID = "user_id";
+    public static final String DESCRIPTION = "description";
+    public static final String ADDRESS = "address";
+    public static final String PORT = "port";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+    public static final String SERVERS_TABLE_CREATE =
             "CREATE TABLE " + SERVERS_TABLE_NAME + " (" +
                     ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     USER_ID + " INTEGER, "+
@@ -34,10 +34,10 @@ public class ScriptyHelper extends SQLiteOpenHelper {
                     USERNAME + " VARCHAR(100), "+
                     PASSWORD + " VARCHAR(100));";
 
-    private static final String COMMANDS_TABLE_NAME = "commands";
-    private static final String SERVER_ID = "server_id";
-    private static final String COMMAND = "command";
-    private static final String COMMANDS_TABLE_CREATE =
+    public static final String COMMANDS_TABLE_NAME = "commands";
+    public static final String SERVER_ID = "server_id";
+    public static final String COMMAND = "command";
+    public static final String COMMANDS_TABLE_CREATE =
             "CREATE TABLE "+ COMMANDS_TABLE_NAME +" ("+
                     ID +" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                     SERVER_ID +" INTEGER, "+

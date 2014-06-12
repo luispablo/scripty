@@ -61,6 +61,7 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
             throw new RuntimeException("Something's wrong... Cannot find nor create the user.");
         } else {
             device = createDevice(userId);
+            Ln.d("Created device: "+ device.describe());
         }
 
         return device;
