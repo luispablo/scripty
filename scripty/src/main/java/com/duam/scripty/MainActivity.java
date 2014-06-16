@@ -7,13 +7,11 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import roboguice.activity.RoboListActivity;
 import roboguice.util.Ln;
@@ -21,13 +19,13 @@ import roboguice.util.Ln;
 /**
  * Created by luispablo on 06/06/14.
  */
-public class CommandsActivity extends RoboListActivity {
+public class MainActivity extends RoboListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ScriptyHelper helper = new ScriptyHelper(CommandsActivity.this);
+        ScriptyHelper helper = new ScriptyHelper(MainActivity.this);
 
         // Si no hay servers ofrecer la descarga.
         if (!helper.existsAnyServer()) {
@@ -45,13 +43,13 @@ public class CommandsActivity extends RoboListActivity {
         Server server = helper.selectAllServers().iterator().next();
         Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, COMMAND}, null, null, null, null, null);
         Ln.d("And found "+ cursor.getCount() +" commands.");
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(CommandsActivity.this, android.R.layout.two_line_list_item, cursor, new String[]{ID, COMMAND}, new int[] {android.R.id.text1, android.R.id.text2}, 0);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(MainActivity.this, android.R.layout.two_line_list_item, cursor, new String[]{ID, COMMAND}, new int[] {android.R.id.text1, android.R.id.text2}, 0);
         setListAdapter(adapter);
     }
 
     private void offerServerDownload() {
         Ln.d("Offering server download");
-        AlertDialog.Builder builder = new AlertDialog.Builder(CommandsActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setMessage(getString(R.string.ask_download_servers));
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             @Override
@@ -63,8 +61,8 @@ public class CommandsActivity extends RoboListActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 // TODO: Fire server download
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CommandsActivity.this);
-                new DownloadServersTask(CommandsActivity.this, prefs.getLong(PREF_USER_ID, -1)) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                new DownloadServersTask(MainActivity.this, prefs.getLong(PREF_USER_ID, -1)) {
 
                 }.execute();
             }
