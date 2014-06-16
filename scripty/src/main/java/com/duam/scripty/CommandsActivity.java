@@ -7,9 +7,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import roboguice.activity.RoboListActivity;
 import roboguice.util.Ln;
@@ -39,9 +43,9 @@ public class CommandsActivity extends RoboListActivity {
     private void loadCommands(ScriptyHelper helper) {
         Ln.d("Loading commands...");
         Server server = helper.selectAllServers().iterator().next();
-        Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, COMMAND}, SERVER_ID + " = ?", new String[]{String.valueOf(server.get_id())}, null, null, null);
+        Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, COMMAND}, null, null, null, null, null);
         Ln.d("And found "+ cursor.getCount() +" commands.");
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(CommandsActivity.this, android.R.layout.simple_list_item_1, cursor, new String[]{ID, COMMAND}, new int[]{1}, 0);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(CommandsActivity.this, android.R.layout.two_line_list_item, cursor, new String[]{ID, COMMAND}, new int[] {android.R.id.text1, android.R.id.text2}, 0);
         setListAdapter(adapter);
     }
 
@@ -68,4 +72,10 @@ public class CommandsActivity extends RoboListActivity {
         builder.create().show();
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        // TODO: Offer options to do with item.
+    }
 }

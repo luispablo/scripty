@@ -10,5 +10,6 @@
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="title_activity_validation_pending_activiy">Validation pending...</string>
 
 </resources>

@@ -27,14 +27,21 @@ public class DownloadServersTask extends RoboAsyncTask<Void> {
         ScriptyService service = restAdapter.create(ScriptyService.class);
 
         List<Server> servers = service.getServers(this.userId);
-        Ln.d("Se descargaron "+ servers.size() +" servers.");
+        Ln.d(servers.size() +" servers downloaded.");
 
         ScriptyHelper helper = new ScriptyHelper(getContext());
 
         for (Server s : servers) {
             helper.insertServer(s);
+
+            Ln.d("Querying commands from server "+ s.getDescription());
+            List<Command> commands = service.getCommands(s.get_id());
+            Ln.d("Found "+ commands.size() +" commands");
+            for (Command cmd : commands) {
+                helper.insertCommand(cmd);
+            }
         }
-        Ln.d("Se insertaron los servers");
+        Ln.d("Servers inserted.");
 
         return null;
     }
