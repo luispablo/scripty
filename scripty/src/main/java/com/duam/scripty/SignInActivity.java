@@ -5,8 +5,6 @@ import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -87,7 +85,7 @@ public class SignInActivity extends RoboActivity {
             Ln.d("The deviceChecked pref exists");
             if (prefs.getBoolean(PREF_DEVICE_CHECKED, false)) {
                 Ln.d("Already checked. Redirecting!");
-                startActivity(new Intent(SignInActivity.this, CommandsActivity.class));
+                startActivity(new Intent(SignInActivity.this, MainActivity.class));
             } else {
                 Ln.d("Not checked yet. Calling server to check...");
                 long deviceId = prefs.getLong(PREF_DEVICE_ID, -1);
@@ -99,7 +97,7 @@ public class SignInActivity extends RoboActivity {
 
                         Ln.d("Server said: "+ checked);
                         if (checked) {
-                            startActivity(new Intent(SignInActivity.this, CommandsActivity.class));
+                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
                         }
                     }
                 }.execute();
