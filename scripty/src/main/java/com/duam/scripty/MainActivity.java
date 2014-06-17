@@ -87,9 +87,15 @@ public class MainActivity extends RoboActivity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle your other action bar items...
 
-        return super.onOptionsItemSelected(item);
+        // Handle your other action bar items...
+        switch (item.getItemId()) {
+            case R.id.action_add_server:
+//                openSearch();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void loadServers() {

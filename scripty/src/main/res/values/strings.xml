@@ -14,5 +14,6 @@
     <string name="drawer_open">View available servers</string>
     <string name="drawer_close">Close server list</string>
     <string name="drawer_title">Available servers</string>
+    <string name="add_server">Add server</string>
 
 </resources>
