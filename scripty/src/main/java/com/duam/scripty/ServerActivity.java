@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.duam.scripty.R;
 
+
 public class ServerActivity extends Activity {
 
     @Override

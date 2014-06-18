@@ -1,6 +1,8 @@
 package com.duam.scripty;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -8,24 +10,24 @@ import com.google.gson.GsonBuilder;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
-import roboguice.util.Ln;
-import roboguice.util.RoboAsyncTask;
 
 import static com.duam.scripty.ScriptyConstants.SCRIPTY_SERVER_URL;
 
 /**
  * Created by luispablo on 06/06/14.
  */
-public class CheckValidationTask extends RoboAsyncTask<Boolean> {
+public class CheckValidationTask extends AsyncTask<Void, Void, Boolean> {
+    private static final String TAG = CheckValidationTask.class.getName();
+
     protected long deviceId;
 
-    protected CheckValidationTask(Context context, long deviceId) {
-        super(context);
+    protected CheckValidationTask(long deviceId) {
+        super();
         this.deviceId = deviceId;
     }
 
     @Override
-    public Boolean call() throws Exception {
+    protected Boolean doInBackground(Void... voids) {
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
@@ -35,10 +37,10 @@ public class CheckValidationTask extends RoboAsyncTask<Boolean> {
 
         ScriptyService service = restAdapter.create(ScriptyService.class);
 
-        Ln.d("Calling server to ask for device " + deviceId);
+        Log.d(TAG, "Calling server to ask for device " + deviceId);
         Device device = service.getDevice(deviceId);
 
-        Ln.d("Got this from the server: "+ device.describe());
+        Log.d(TAG, "Got this from the server: " + device.describe());
         return (device != null && device.isEmailChecked());
     }
 }

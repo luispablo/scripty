@@ -3,8 +3,10 @@ package com.duam.scripty;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.ScriptyHelper.*;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,14 +22,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import roboguice.activity.RoboActivity;
-import roboguice.activity.RoboListActivity;
-import roboguice.util.Ln;
-
 /**
  * Created by luispablo on 06/06/14.
  */
-public class MainActivity extends RoboActivity {
+public class MainActivity extends Activity {
+    private static final String TAG = MainActivity.class.getName();
+
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -101,11 +102,16 @@ public class MainActivity extends RoboActivity {
         // Handle your other action bar items...
         switch (item.getItemId()) {
             case R.id.action_add_server:
-//                openSearch();
+                newServer();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void newServer() {
+        Intent intent = new Intent(getApplicationContext(), ServerActivity.class);
+        startActivity(intent);
     }
 
     private void loadServers() {
@@ -113,18 +119,18 @@ public class MainActivity extends RoboActivity {
 
         // Si no hay servers ofrecer la descarga.
         if (!helper.existsAnyServer()) {
-            Ln.d("There're no servers...");
+            Log.d(TAG, "There're no servers...");
             offerServerDownload();
         }
         else {
-            Ln.d("We have servers!");
+            Log.d(TAG, "We have servers!");
             fillDrawer(helper);
         }
     }
 
     private void fillDrawer(ScriptyHelper helper) {
         Cursor cursor = helper.getReadableDatabase().query(SERVERS_TABLE_NAME, new String[]{ID, DESCRIPTION}, null, null, null, null, null);
-        Ln.d("There're "+ cursor.getCount() +" servers");
+        Log.d(TAG, "There're "+ cursor.getCount() +" servers");
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(MainActivity.this, R.layout.drawer_list_item, cursor, new String[]{DESCRIPTION}, new int[] {android.R.id.text1}, 0);
         mDrawerList.setAdapter(adapter);
     }
@@ -139,7 +145,7 @@ public class MainActivity extends RoboActivity {
 //    }
 
     private void offerServerDownload() {
-        Ln.d("Offering server download");
+        Log.d(TAG, "Offering server download");
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setMessage(getString(R.string.ask_download_servers));
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -155,9 +161,8 @@ public class MainActivity extends RoboActivity {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                 new DownloadServersTask(MainActivity.this, prefs.getLong(PREF_USER_ID, -1)) {
                     @Override
-                    protected void onSuccess(Void aVoid) throws Exception {
-                        super.onSuccess(aVoid);
-
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
                         fillDrawer(new ScriptyHelper(MainActivity.this));
                     }
                 }.execute();

@@ -25,6 +25,6 @@
     <string name="port">SSH port</string>
     <string name="username">Username (optional)</string>
     <string name="password">Password (optional)</string>
-    <string name="optional_credentials_hint">If you don't enter username and/or password, they'll be asked when running a command.</string>
+    <string name="optional_credentials_hint">If you don\'t enter username and/or password, they\'ll be asked when running a command.</string>
 
 </resources>

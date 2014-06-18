@@ -5,10 +5,12 @@ import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,12 +18,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import roboguice.activity.RoboActivity;
-import roboguice.util.Ln;
 
+public class SignInActivity extends Activity {
+    private static final String TAG = SignInActivity.class.getName();
 
-public class SignInActivity extends RoboActivity {
-    @Override
     protected void onResume() {
         super.onResume();
 
@@ -42,31 +42,33 @@ public class SignInActivity extends RoboActivity {
 
                 new SendValidationTask(SignInActivity.this, email) {
                     @Override
-                    protected void onPreExecute() throws Exception {
+                    protected void onPreExecute() {
                         dialog.setMessage("Sending validation token to your e-mail...");
                         dialog.show();
                     }
                     @Override
                     protected void onException(Exception e) {
                         Toast.makeText(SignInActivity.this, "ERROR: "+ e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Ln.e(e);
+                        Log.e(TAG, "Error sending validation", e);
                     }
 
                     @Override
-                    protected void onSuccess(Device device) throws Exception {
-                        super.onSuccess(device);
+                    protected void onPostExecute(Device device) {
+                        super.onPostExecute(device);
 
-                        Ln.d("Storing device with id "+ device.getId() +" and key "+ device.getKey());
+                        if (device != null) {
+                            Log.d(TAG, "Storing device with id "+ device.getId() +" and key "+ device.getKey());
 
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putLong(PREF_DEVICE_ID, device.getId());
-                        editor.putString(PREF_DEVICE_KEY, device.getKey());
-                        editor.putBoolean(PREF_DEVICE_CHECKED, false);
-                        editor.putLong(PREF_USER_ID, device.getUserId());
-                        editor.commit();
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putLong(PREF_DEVICE_ID, device.getId());
+                            editor.putString(PREF_DEVICE_KEY, device.getKey());
+                            editor.putBoolean(PREF_DEVICE_CHECKED, false);
+                            editor.putLong(PREF_USER_ID, device.getUserId());
+                            editor.commit();
 
-                        Toast.makeText(SignInActivity.this, "Validation mail sent. Please check your inbox to start using Scripty!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SignInActivity.this, "Validation mail sent. Please check your inbox to start using Scripty!", Toast.LENGTH_LONG).show();
+                        }
                     }
 
                     @Override
@@ -82,20 +84,20 @@ public class SignInActivity extends RoboActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
 
         if (prefs.contains(PREF_DEVICE_CHECKED)) {
-            Ln.d("The deviceChecked pref exists");
+            Log.d(TAG, "The deviceChecked pref exists");
             if (prefs.getBoolean(PREF_DEVICE_CHECKED, false)) {
-                Ln.d("Already checked. Redirecting!");
+                Log.d(TAG, "Already checked. Redirecting!");
                 startActivity(new Intent(SignInActivity.this, MainActivity.class));
             } else {
-                Ln.d("Not checked yet. Calling server to check...");
+                Log.d(TAG, "Not checked yet. Calling server to check...");
                 long deviceId = prefs.getLong(PREF_DEVICE_ID, -1);
 
-                new CheckValidationTask(SignInActivity.this, deviceId) {
+                new CheckValidationTask(deviceId) {
                     @Override
-                    protected void onSuccess(Boolean checked) throws Exception {
-                        super.onSuccess(checked);
+                    protected void onPostExecute(Boolean checked) {
+                        super.onPostExecute(checked);
 
-                        Ln.d("Server said: "+ checked);
+                        Log.d(TAG, "Server said: "+ checked);
                         if (checked) {
                             startActivity(new Intent(SignInActivity.this, MainActivity.class));
                         }
@@ -103,7 +105,7 @@ public class SignInActivity extends RoboActivity {
                 }.execute();
             }
         } else {
-            Ln.d("The deviceChecked pref does not exist.");
+            Log.d(TAG, "The deviceChecked pref does not exist.");
         }
     }
 
