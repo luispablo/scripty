@@ -8,12 +8,23 @@
     <string name="sign_in">Sign In</string>
     <string name="email">e-mail</string>
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
+
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <string name="title_activity_validation_pending_activiy">Validation pending...</string>
     <string name="drawer_open">View available servers</string>
     <string name="drawer_close">Close server list</string>
     <string name="drawer_title">Available servers</string>
     <string name="add_server">Add server</string>
+    <string name="title_activity_server">ServerActivity</string>
+    <string name="description">Description</string>
+    <string name="address">Address (IP or name)</string>
+    <string name="port">SSH port</string>
+    <string name="username">Username (optional)</string>
+    <string name="password">Password (optional)</string>
+    <string name="optional_credentials_hint">If you don't enter username and/or password, they'll be asked when running a command.</string>
 
 </resources>
