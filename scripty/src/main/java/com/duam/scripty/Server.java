@@ -12,6 +12,19 @@ public class Server {
     private String username;
     private String password;
 
+    public Server() {
+
+    }
+
+    public Server(long userId, String description, String address, int port, String username, String password) {
+        this.userId = userId;
+        this.description = description;
+        this.address = address;
+        this.port = port;
+        this.username = username;
+        this.password = password;
+    }
+
     public long get_id() {
         return _id;
     }

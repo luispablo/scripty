@@ -82,14 +82,14 @@
         android:layout_height="wrap_content"
         style="?android:attr/buttonBarStyle">
 
-        <Button	android:id="@+id/btnCancelar"
+        <Button	android:id="@+id/btnServerCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel"
             android:layout_weight="1"
             style="?android:attr/buttonBarButtonStyle" />
 
-        <Button	android:id="@+id/buttonGrabarMovimiento"
+        <Button	android:id="@+id/btnServerOK"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ok"

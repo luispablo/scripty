@@ -9,10 +9,14 @@
     <string name="email">e-mail</string>
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
 
+    <!-- Words -->
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Messages -->
+    <string name="server_saved">Server successfully saved</string>
 
     <string name="title_activity_validation_pending_activiy">Validation pending...</string>
     <string name="drawer_open">View available servers</string>
