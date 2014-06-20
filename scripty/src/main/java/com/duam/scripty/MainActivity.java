@@ -1,10 +1,12 @@
 package com.duam.scripty;
 
+import static com.duam.scripty.ServerActivity.SERVER_SAVED;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.ScriptyHelper.*;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -18,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import roboguice.activity.RoboActivity;
 import roboguice.activity.RoboListActivity;
@@ -30,6 +33,7 @@ public class MainActivity extends RoboActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private SimpleCursorAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,10 +105,29 @@ public class MainActivity extends RoboActivity {
         // Handle your other action bar items...
         switch (item.getItemId()) {
             case R.id.action_add_server:
-//                openSearch();
+                addServer();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void addServer() {
+        Ln.d("Want to add a server...");
+        Intent intent = new Intent(this, ServerActivity.class);
+        startActivityForResult(intent, 1);
+        Ln.d("Intent fired!");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == SERVER_SAVED) {
+            adapter.swapCursor(serversCursor(new ScriptyHelper(this)));
+            adapter.notifyDataSetChanged();
+        } else {
+            Ln.d("Not saved... :(");
         }
     }
 
@@ -122,10 +145,12 @@ public class MainActivity extends RoboActivity {
         }
     }
 
+    private Cursor serversCursor(ScriptyHelper helper) {
+        return helper.getReadableDatabase().query(SERVERS_TABLE_NAME, new String[]{ID, DESCRIPTION}, null, null, null, null, null);
+    }
+
     private void fillDrawer(ScriptyHelper helper) {
-        Cursor cursor = helper.getReadableDatabase().query(SERVERS_TABLE_NAME, new String[]{ID, DESCRIPTION}, null, null, null, null, null);
-        Ln.d("There're "+ cursor.getCount() +" servers");
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(MainActivity.this, R.layout.drawer_list_item, cursor, new String[]{DESCRIPTION}, new int[] {android.R.id.text1}, 0);
+        adapter = new SimpleCursorAdapter(MainActivity.this, R.layout.drawer_list_item, serversCursor(helper), new String[]{DESCRIPTION}, new int[] {android.R.id.text1}, 0);
         mDrawerList.setAdapter(adapter);
     }
 
