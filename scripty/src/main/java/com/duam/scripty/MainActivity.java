@@ -5,6 +5,8 @@ import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.ScriptyHelper.*;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -29,7 +32,7 @@ import roboguice.util.Ln;
 /**
  * Created by luispablo on 06/06/14.
  */
-public class MainActivity extends RoboActivity {
+public class MainActivity extends RoboActivity implements CommandFragment.OnFragmentInteractionListener{
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -63,6 +66,18 @@ public class MainActivity extends RoboActivity {
             }
         };
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Fragment fragment = CommandFragment.newInstance(id);
+                FragmentManager fm = getFragmentManager();
+                fm.beginTransaction()
+                        .replace(R.id.content_frame, fragment)
+                        .commit();
+
+                mDrawerLayout.closeDrawer(mDrawerList);
+            }
+        });
 
         loadServers();
 
@@ -191,4 +206,8 @@ public class MainActivity extends RoboActivity {
         builder.create().show();
     }
 
+    @Override
+    public void onFragmentInteraction(String id) {
+
+    }
 }
