@@ -25,8 +25,7 @@
         </activity>
         <activity
             android:name=".ServerActivity"
-            android:label="@string/title_activity_server"
-            android:theme="@android:style/Theme.Dialog">
+            android:label="@string/title_activity_server" >
         </activity>
     </application>
 

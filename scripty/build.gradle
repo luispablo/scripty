@@ -26,6 +26,6 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:19.+'
+    compile 'org.roboguice:roboguice:3.0b-experimental'
     compile 'com.squareup.retrofit:retrofit:1.5.1'
-    compile 'com.jakewharton:butterknife:5.1.0'
 }

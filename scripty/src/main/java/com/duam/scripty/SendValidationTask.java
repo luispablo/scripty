@@ -8,12 +8,12 @@ import static com.duam.scripty.ScriptyConstants.CREATE_DEVICE_URI;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.inject.Inject;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,55 +32,39 @@ import java.util.List;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import roboguice.util.Ln;
+import roboguice.util.RoboAsyncTask;
 
 /**
  * Created by luispablo on 11/05/14.
  */
-public class SendValidationTask extends AsyncTask<Void, Void, Device> {
-    private static final String TAG = SendValidationTask.class.getName();
+public class SendValidationTask extends RoboAsyncTask<Device> {
 
     protected ProgressDialog dialog;
 
     protected String email;
 
     public SendValidationTask(Context context, String email) {
-        super();
+        super(context);
         this.dialog = new ProgressDialog(context);
         this.email = email;
     }
 
     @Override
-    protected Device doInBackground(Void... voids) {
-        try {
-            String userId = findUserId(email);
-            Device device = null;
+    public Device call() throws Exception {
+        String userId = findUserId(email);
+        Device device = null;
 
-            if (userId == null || userId.trim().length() == 0) userId = createUser(email);
+        if (userId == null || userId.trim().length() == 0) userId = createUser(email);
 
-            if (userId == null || userId.trim().length() == 0) {
-                throw new RuntimeException("Something's wrong... Cannot find nor create the user.");
-            } else {
-                device = createDevice(userId);
-                Log.d(TAG, "Created device: "+ device.describe());
-            }
-
-            return device;
-
-        } catch (IOException | JSONException e) {
-            onException(e);
-        } finally {
-            onFinally();
+        if (userId == null || userId.trim().length() == 0) {
+            throw new RuntimeException("Something's wrong... Cannot find nor create the user.");
+        } else {
+            device = createDevice(userId);
+            Ln.d("Created device: "+ device.describe());
         }
 
-        return null;
-    }
-
-    protected void onException(Exception e) {
-        // To be implemented by the client if wanted...
-    }
-
-    protected void onFinally() {
-        // To be implemented by the client if wanted...
+        return device;
     }
 
     private Device createDevice(String userId) throws IOException {
@@ -119,5 +103,4 @@ public class SendValidationTask extends AsyncTask<Void, Void, Device> {
             return null;
         }
     }
-
 }
