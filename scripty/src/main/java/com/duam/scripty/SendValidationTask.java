@@ -1,39 +1,23 @@
 package com.duam.scripty;
 
-import static com.duam.scripty.ScriptyConstants.SCRIPTY_SERVER_URL;
-import static com.duam.scripty.ScriptyConstants.FIND_USER_URI;
-import static com.duam.scripty.ScriptyConstants.USER_URI;
-import static com.duam.scripty.ScriptyConstants.CREATE_DEVICE_URI;
-
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
-import com.google.inject.Inject;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
+
+import static com.duam.scripty.ScriptyConstants.SCRIPTY_SERVER_URL;
 
 /**
  * Created by luispablo on 11/05/14.

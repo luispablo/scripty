@@ -1,10 +1,5 @@
 package com.duam.scripty;
 
-import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
-import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
-import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
-import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +13,11 @@ import android.widget.Toast;
 
 import roboguice.activity.RoboActivity;
 import roboguice.util.Ln;
+
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
+import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 
 
 public class SignInActivity extends RoboActivity {

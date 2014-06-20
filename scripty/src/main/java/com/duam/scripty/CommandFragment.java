@@ -1,17 +1,19 @@
 package com.duam.scripty;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.app.ListFragment;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import roboguice.util.Ln;
 
-import static com.duam.scripty.ScriptyHelper.*;
+import static com.duam.scripty.ScriptyHelper.COMMAND;
+import static com.duam.scripty.ScriptyHelper.COMMANDS_TABLE_NAME;
+import static com.duam.scripty.ScriptyHelper.DESCRIPTION;
+import static com.duam.scripty.ScriptyHelper.ID;
 import static com.duam.scripty.ScriptyHelper.SERVER_ID;
 
 

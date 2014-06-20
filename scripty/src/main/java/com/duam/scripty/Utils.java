@@ -1,6 +1,5 @@
 package com.duam.scripty;
 
-import android.text.Editable;
 import android.widget.EditText;
 
 /**

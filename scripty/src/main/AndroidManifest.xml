@@ -26,7 +26,15 @@
         <activity
             android:name=".ServerActivity"
             android:label="@string/title_activity_server"
-            android:theme="@style/DialogTheme">
+            android:theme="@style/DialogTheme" >
+        </activity>
+        <activity
+            android:name=".CommandActivity"
+            android:label="@string/title_activity_command"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainActivity" />
         </activity>
     </application>
 
