@@ -79,7 +79,7 @@ public class SignInActivity extends RoboActivity {
     }
 
     private void checkValidation() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SignInActivity.this);
 
         if (prefs.contains(PREF_DEVICE_CHECKED)) {
             Ln.d("The deviceChecked pref exists");
@@ -97,6 +97,10 @@ public class SignInActivity extends RoboActivity {
 
                         Ln.d("Server said: "+ checked);
                         if (checked) {
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putBoolean(PREF_DEVICE_CHECKED, true);
+                            editor.commit();
+
                             startActivity(new Intent(SignInActivity.this, MainActivity.class));
                         }
                     }

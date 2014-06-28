@@ -36,6 +36,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
         </activity>
+        <activity
+            android:name=".CommandActionsActivity"
+            android:label="@string/command_options_title"
+            android:theme="@style/DialogTheme">
+        </activity>
     </application>
 
 </manifest>

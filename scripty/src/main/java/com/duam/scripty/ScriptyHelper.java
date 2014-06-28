@@ -37,12 +37,22 @@ public class ScriptyHelper extends SQLiteOpenHelper {
     public static final String COMMANDS_TABLE_NAME = "commands";
     public static final String SERVER_ID = "server_id";
     public static final String COMMAND = "command";
+    public static final String COMMAND_ID = "command_id";
     public static final String COMMANDS_TABLE_CREATE =
             "CREATE TABLE "+ COMMANDS_TABLE_NAME +" ("+
                     ID +" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                     SERVER_ID +" INTEGER, "+
                     DESCRIPTION +" VARCHAR(255), "+
                     COMMAND +" VARCHAR(255));";
+
+    public static final String[] SERVER_COLUMNS = {
+            ID,
+            USER_ID,
+            DESCRIPTION,
+            ADDRESS,
+            PORT,
+            USERNAME,
+            PASSWORD };
 
     public ScriptyHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -57,6 +67,44 @@ public class ScriptyHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
 
+    }
+
+    public Command retrieveCommand(long id) {
+        Cursor cursor = getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND, SERVER_ID}, ID+" = ?", new String[]{String.valueOf(id)}, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            Command command = new Command();
+            command.setCommand(cursor.getString(2));
+            command.setServerId(cursor.getLong(3));
+            command.setDescription(cursor.getString(1));
+            command.set_id(id);
+
+            cursor.close();
+
+            return command;
+        } else {
+            return null;
+        }
+    }
+
+    public Server retrieveServer(long id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(SERVERS_TABLE_NAME, SERVER_COLUMNS, ID+" = ?", new String[]{String.valueOf(id)}, null, null, null);
+
+        Server server = null;
+
+        if (c.moveToFirst()) {
+            server = new Server();
+            server.set_id(c.getLong(0));
+            server.setUserId(c.getLong(1));
+            server.setDescription(c.getString(2));
+            server.setAddress(c.getString(3));
+            server.setPort(c.getInt(4));
+            server.setUsername(c.getString(5));
+            server.setPassword(c.getString(6));
+        }
+
+        return server;
     }
 
     public void insertCommand(Command command) {

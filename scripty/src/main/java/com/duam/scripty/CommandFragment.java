@@ -2,6 +2,7 @@ package com.duam.scripty;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.SimpleCursorAdapter;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyHelper.COMMAND;
+import static com.duam.scripty.ScriptyHelper.COMMAND_ID;
 import static com.duam.scripty.ScriptyHelper.COMMANDS_TABLE_NAME;
 import static com.duam.scripty.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.ScriptyHelper.ID;
@@ -25,6 +27,8 @@ import static com.duam.scripty.ScriptyHelper.SERVER_ID;
  * interface.
  */
 public class CommandFragment extends ListFragment {
+
+    private static final int COMMAND_ACTIONS_CODE = 10;
 
     private OnFragmentInteractionListener mListener;
 
@@ -80,6 +84,10 @@ public class CommandFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+
+        Intent intent = new Intent(getActivity(), CommandActionsActivity.class);
+        intent.putExtra(COMMAND_ID, id);
+        startActivityForResult(intent, COMMAND_ACTIONS_CODE);
 
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the

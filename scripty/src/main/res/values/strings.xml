@@ -8,12 +8,14 @@
     <string name="sign_in">Sign In</string>
     <string name="email">e-mail</string>
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
+    <string name="command_options_title">And now...</string>
 
     <!-- Words -->
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="run">Run</string>
 
     <!-- Messages -->
     <string name="server_saved">Server successfully saved</string>
@@ -35,5 +37,9 @@
     <string name="optional_credentials_hint">If you don\'t enter username and/or password, they\'ll be asked when running a command.</string>
     <string name="title_activity_command">Command</string>
     <string name="command">Command</string>
+    <string name="title_activity_command_actions">CommandActionsActivity</string>
+    <string name="run_command">Run %1$s on %2$s</string>
+    <string name="running">Running command...</string>
+    <string name="successfully">Executed successfully!</string>
 
 </resources>
