@@ -108,12 +108,20 @@ public class ScriptyHelper extends SQLiteOpenHelper {
     }
 
     public void insertCommand(Command command) {
+        command.set_id(getWritableDatabase().insert(COMMANDS_TABLE_NAME, null, values(command)));
+    }
+
+    private ContentValues values(Command command) {
         ContentValues values = new ContentValues();
         values.put(SERVER_ID, command.getServerId());
         values.put(DESCRIPTION, command.getDescription());
         values.put(COMMAND, command.getCommand());
 
-        command.set_id(getWritableDatabase().insert(COMMANDS_TABLE_NAME, null, values));
+        return values;
+    }
+
+    public void updateCommad(Command command) {
+        getWritableDatabase().update(COMMANDS_TABLE_NAME, values(command), ID+" = ?", new String[]{String.valueOf(command.get_id())});
     }
 
     public void insertServer(Server server) {

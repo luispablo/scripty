@@ -21,4 +21,13 @@
         android:id="@+id/btnRunCommand"
         android:drawableLeft="@drawable/ic_action_play"
         android:textAlignment="center" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit"
+        android:id="@+id/btnEditCommand"
+        android:drawableLeft="@drawable/ic_action_edit"
+        android:textAlignment="center" />
+
 </LinearLayout>

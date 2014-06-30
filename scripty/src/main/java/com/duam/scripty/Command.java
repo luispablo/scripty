@@ -1,9 +1,11 @@
 package com.duam.scripty;
 
+import java.io.Serializable;
+
 /**
  * Created by lgallo on 19/05/14.
  */
-public class Command {
+public class Command implements Serializable{
     private long _id;
     private long serverId;
     private String description;

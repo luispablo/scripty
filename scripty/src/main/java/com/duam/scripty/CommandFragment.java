@@ -18,6 +18,8 @@ import static com.duam.scripty.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.ScriptyHelper.ID;
 import static com.duam.scripty.ScriptyHelper.SERVER_ID;
 
+import static com.duam.scripty.CommandActionsActivity.COMMAND_EDITED_RESULT;
+
 
 /**
  * A fragment representing a list of Items.
@@ -31,9 +33,12 @@ public class CommandFragment extends ListFragment {
     private static final int COMMAND_ACTIONS_CODE = 10;
 
     private OnFragmentInteractionListener mListener;
+    private SimpleCursorAdapter adapter;
+    private long serverId;
 
     public static CommandFragment newInstance(Long serverId) {
         CommandFragment fragment = new CommandFragment();
+        fragment.setServerId(serverId);
         Bundle args = new Bundle();
         args.putLong(SERVER_ID, serverId);
         fragment.setArguments(args);
@@ -47,6 +52,10 @@ public class CommandFragment extends ListFragment {
     public CommandFragment() {
     }
 
+    public void setServerId(long serverId) {
+        this.serverId = serverId;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +67,7 @@ public class CommandFragment extends ListFragment {
         Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
         Ln.d("Found "+ cursor.getCount() +" commands");
 
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.two_line_list_item, cursor, new String[]{DESCRIPTION, COMMAND}, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+        adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.two_line_list_item, cursor, new String[]{DESCRIPTION, COMMAND}, new int[]{android.R.id.text1, android.R.id.text2}, 0);
         setListAdapter(adapter);
     }
 
@@ -80,6 +89,19 @@ public class CommandFragment extends ListFragment {
         mListener = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (resultCode) {
+            case COMMAND_EDITED_RESULT:
+                ScriptyHelper helper = new ScriptyHelper(getActivity());
+                Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
+                adapter.swapCursor(cursor);
+                adapter.notifyDataSetChanged();
+                break;
+        }
+    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {

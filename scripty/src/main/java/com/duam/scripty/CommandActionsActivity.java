@@ -2,6 +2,7 @@ package com.duam.scripty;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,14 +19,19 @@ import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyHelper.COMMAND_ID;
+import static com.duam.scripty.ScriptyHelper.COMMAND;
 
 public class CommandActionsActivity extends RoboActivity {
+    public static final int EDIT_COMMAND_CODE = 10;
+
+    public static final int COMMAND_EDITED_RESULT = 100;
 
     private Command command;
     private Server server;
 
     @InjectView(R.id.txtCommand) TextView txtCommand;
     @InjectView(R.id.btnRunCommand) Button btnRunCommand;
+    @InjectView(R.id.btnEditCommand) Button btnEditCommand;
 
     @InjectResource(R.string.run_command) String runCommand;
     @InjectResource(R.string.running) String running;
@@ -50,6 +56,31 @@ public class CommandActionsActivity extends RoboActivity {
                 runCommand(command);
             }
         });
+        btnEditCommand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editCommand(command);
+            }
+        });
+    }
+
+    private void editCommand(Command command) {
+        Intent intent = new Intent(this, CommandActivity.class);
+        Ln.d("Putting command with id "+ command.get_id());
+        intent.putExtra(COMMAND, command);
+        startActivityForResult(intent, EDIT_COMMAND_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case EDIT_COMMAND_CODE:
+                setResult(COMMAND_EDITED_RESULT);
+                finish();
+                break;
+        }
     }
 
     private void runCommand(Command command) {

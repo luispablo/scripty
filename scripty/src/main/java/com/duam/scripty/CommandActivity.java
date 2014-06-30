@@ -17,6 +17,7 @@ import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyHelper.SERVER_ID;
+import static com.duam.scripty.ScriptyHelper.COMMAND;
 
 public class CommandActivity extends RoboActivity {
     public static final int COMMAND_SAVED = 1;
@@ -31,6 +32,7 @@ public class CommandActivity extends RoboActivity {
     @InjectResource(R.string.command_saved) String commandSaved;
 
     private long serverId;
+    private long commandId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,9 @@ public class CommandActivity extends RoboActivity {
 
         serverId = getIntent().getLongExtra(SERVER_ID, -1);
         Ln.d("Command for server " + serverId);
+
+        // If command given, keep its values for editing.
+        initializeValues((Command) getIntent().getSerializableExtra(COMMAND));
 
         btnCommandCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,17 +63,34 @@ public class CommandActivity extends RoboActivity {
         });
     }
 
+    private void initializeValues(Command command) {
+        if (command != null) {
+            Ln.d("Received command with id "+ command.get_id());
+            commandId = command.get_id();
+            serverId = command.getServerId();
+            editCommand.setText(command.getCommand());
+            editDescription.setText(command.getDescription());
+        }
+    }
+
     private boolean saveCommand() {
         boolean saved = false;
 
         if (fieldsValid()) {
+            Ln.d("Saving command with id "+ commandId);
             Command command = new Command();
             command.setDescription(editDescription.getText().toString());
             command.setCommand(editCommand.getText().toString());
             command.setServerId(serverId);
+            command.set_id(commandId);
 
             ScriptyHelper helper = new ScriptyHelper(this);
-            helper.insertCommand(command);
+
+            if (command.get_id() == -1) {
+                helper.insertCommand(command);
+            } else {
+                helper.updateCommad(command);
+            }
 
             saved = true;
             Toast.makeText(this, commandSaved, Toast.LENGTH_LONG).show();

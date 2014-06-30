@@ -16,6 +16,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="run">Run</string>
+    <string name="edit">Edit</string>
 
     <!-- Messages -->
     <string name="server_saved">Server successfully saved</string>
