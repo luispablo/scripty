@@ -1,6 +1,7 @@
 package com.duam.scripty;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ public class CommandActionsActivity extends RoboActivity {
     public static final int EDIT_COMMAND_CODE = 10;
 
     public static final int COMMAND_EDITED_RESULT = 100;
+    public static final int COMMAND_DELETED_RESULT = 200;
 
     private Command command;
     private Server server;
@@ -32,6 +34,7 @@ public class CommandActionsActivity extends RoboActivity {
     @InjectView(R.id.txtCommand) TextView txtCommand;
     @InjectView(R.id.btnRunCommand) Button btnRunCommand;
     @InjectView(R.id.btnEditCommand) Button btnEditCommand;
+    @InjectView(R.id.btnDeleteCommand) Button btnDeleteCommand;
 
     @InjectResource(R.string.run_command) String runCommand;
     @InjectResource(R.string.running) String running;
@@ -62,6 +65,19 @@ public class CommandActionsActivity extends RoboActivity {
                 editCommand(command);
             }
         });
+        btnDeleteCommand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                delete(command);
+            }
+        });
+    }
+
+    private void delete(Command command) {
+        ScriptyHelper helper = new ScriptyHelper(this);
+        helper.deleteCommand(command.get_id());
+        setResult(COMMAND_DELETED_RESULT);
+        finish();
     }
 
     private void editCommand(Command command) {

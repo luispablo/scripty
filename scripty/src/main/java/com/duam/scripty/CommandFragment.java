@@ -19,6 +19,7 @@ import static com.duam.scripty.ScriptyHelper.ID;
 import static com.duam.scripty.ScriptyHelper.SERVER_ID;
 
 import static com.duam.scripty.CommandActionsActivity.COMMAND_EDITED_RESULT;
+import static com.duam.scripty.CommandActionsActivity.COMMAND_DELETED_RESULT;
 
 
 /**
@@ -95,12 +96,19 @@ public class CommandFragment extends ListFragment {
 
         switch (resultCode) {
             case COMMAND_EDITED_RESULT:
-                ScriptyHelper helper = new ScriptyHelper(getActivity());
-                Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
-                adapter.swapCursor(cursor);
-                adapter.notifyDataSetChanged();
+                refresh();
+                break;
+            case COMMAND_DELETED_RESULT:
+                refresh();
                 break;
         }
+    }
+
+    private void refresh() {
+        ScriptyHelper helper = new ScriptyHelper(getActivity());
+        Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
+        adapter.swapCursor(cursor);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

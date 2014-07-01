@@ -30,4 +30,12 @@
         android:drawableLeft="@drawable/ic_action_edit"
         android:textAlignment="center" />
 
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/delete"
+        android:id="@+id/btnDeleteCommand"
+        android:drawableLeft="@drawable/ic_action_discard"
+        android:textAlignment="center" />
+
 </LinearLayout>

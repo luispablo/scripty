@@ -124,6 +124,10 @@ public class ScriptyHelper extends SQLiteOpenHelper {
         getWritableDatabase().update(COMMANDS_TABLE_NAME, values(command), ID+" = ?", new String[]{String.valueOf(command.get_id())});
     }
 
+    public int deleteCommand(long id) {
+        return getWritableDatabase().delete(COMMANDS_TABLE_NAME, ID+ " = ?", new String[]{String.valueOf(id)});
+    }
+
     public void insertServer(Server server) {
         ContentValues values = new ContentValues();
         values.put(USER_ID, server.getUserId());
