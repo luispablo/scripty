@@ -128,7 +128,7 @@ public class ScriptyHelper extends SQLiteOpenHelper {
         return getWritableDatabase().delete(COMMANDS_TABLE_NAME, ID+ " = ?", new String[]{String.valueOf(id)});
     }
 
-    public void insertServer(Server server) {
+    private ContentValues values(Server server) {
         ContentValues values = new ContentValues();
         values.put(USER_ID, server.getUserId());
         values.put(DESCRIPTION, server.getDescription());
@@ -137,7 +137,15 @@ public class ScriptyHelper extends SQLiteOpenHelper {
         values.put(USERNAME, server.getUsername());
         values.put(PASSWORD, server.getPassword());
 
-        server.set_id(getWritableDatabase().insert(SERVERS_TABLE_NAME, null, values));
+        return values;
+    }
+
+    public void insertServer(Server server) {
+        server.set_id(getWritableDatabase().insert(SERVERS_TABLE_NAME, null, values(server)));
+    }
+
+    public int updateServer(Server server) {
+        return getWritableDatabase().update(SERVERS_TABLE_NAME, values(server), ID+" = ?", new String[]{String.valueOf(server.get_id())});
     }
 
     public boolean existsAnyServer() {

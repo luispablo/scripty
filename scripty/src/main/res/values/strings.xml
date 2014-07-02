@@ -30,6 +30,7 @@
     <string name="drawer_title">Available servers</string>
     <string name="add_server">Add server</string>
     <string name="add_command">Add command</string>
+    <string name="edit_server">Edit current server</string>
     <string name="title_activity_server">New Server</string>
     <string name="description">Description</string>
     <string name="address">Address (IP or name)</string>

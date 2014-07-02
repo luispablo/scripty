@@ -18,8 +18,12 @@ import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.Utils.isEmpty;
+import static com.duam.scripty.ScriptyHelper.SERVER_ID;
+
 
 public class ServerActivity extends RoboActivity {
+    public static final int EDIT_SERVER_CODE = 50;
+
     public static final int SERVER_SAVED = 1;
     public static final int ACTION_CANCELED = 2;
 
@@ -38,10 +42,15 @@ public class ServerActivity extends RoboActivity {
 
     @Inject SharedPreferences prefs;
 
+    private long serverId = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server);
+
+        serverId = getIntent().getLongExtra(SERVER_ID, -1);
+        initializeValues();
 
         btnServerOK.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +66,18 @@ public class ServerActivity extends RoboActivity {
         });
     }
 
+    private void initializeValues() {
+        if (serverId > 0) {
+            ScriptyHelper helper = new ScriptyHelper(this);
+            Server server = helper.retrieveServer(serverId);
+
+            editAddress.setText(server.getAddress());
+            editDescription.setText(server.getDescription());
+            editPort.setText(String.valueOf(server.getPort()));
+            editUsername.setText(server.getUsername());
+        }
+    }
+
     public void ok() {
         if (validate()) {
             Ln.d("About to save server");
@@ -64,6 +85,7 @@ public class ServerActivity extends RoboActivity {
             long userId = prefs.getLong(PREF_USER_ID, -1);
 
             Server server = new Server();
+            server.set_id(serverId);
             server.setPort(Integer.valueOf(editPort.getText().toString()));
             server.setDescription(editDescription.getText().toString());
             server.setAddress(editAddress.getText().toString());
@@ -72,7 +94,11 @@ public class ServerActivity extends RoboActivity {
             if (!isEmpty(editUsername)) server.setUsername(editUsername.getText().toString());
             if (!isEmpty(editPassword)) server.setPassword(editPassword.getText().toString());
 
-            helper.insertServer(server);
+            if (serverId > 0) {
+                helper.updateServer(server);
+            } else {
+                helper.insertServer(server);
+            }
             Ln.d("Server saved");
 
             Toast.makeText(this, serverSaved, Toast.LENGTH_LONG).show();
@@ -83,6 +109,8 @@ public class ServerActivity extends RoboActivity {
             Toast.makeText(this, fixErrors, Toast.LENGTH_LONG).show();
         }
     }
+
+
 
     public boolean validate() {
         boolean isValid = true;

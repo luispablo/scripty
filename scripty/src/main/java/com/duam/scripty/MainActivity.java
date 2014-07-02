@@ -160,8 +160,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         switch (requestCode) {
             case SERVER_FRAGMENT:
                 if (resultCode == SERVER_SAVED) {
-                    adapter.swapCursor(serversCursor(new ScriptyHelper(this)));
-                    adapter.notifyDataSetChanged();
+                    refreshServers();
                 } else {
                     Ln.d("Not saved... :(");
                 }
@@ -172,6 +171,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
                 }
                 break;
         }
+    }
+
+    public void refreshServers() {
+        adapter.swapCursor(serversCursor(new ScriptyHelper(this)));
+        adapter.notifyDataSetChanged();
     }
 
     private long loadServers() {

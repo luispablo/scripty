@@ -5,6 +5,9 @@ import android.app.ListFragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -20,7 +23,8 @@ import static com.duam.scripty.ScriptyHelper.SERVER_ID;
 
 import static com.duam.scripty.CommandActionsActivity.COMMAND_EDITED_RESULT;
 import static com.duam.scripty.CommandActionsActivity.COMMAND_DELETED_RESULT;
-
+import static com.duam.scripty.ServerActivity.EDIT_SERVER_CODE;
+import static com.duam.scripty.ServerActivity.SERVER_SAVED;
 
 /**
  * A fragment representing a list of Items.
@@ -70,6 +74,8 @@ public class CommandFragment extends ListFragment {
 
         adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.two_line_list_item, cursor, new String[]{DESCRIPTION, COMMAND}, new int[]{android.R.id.text1, android.R.id.text2}, 0);
         setListAdapter(adapter);
+
+        setHasOptionsMenu(true);
     }
 
 
@@ -94,13 +100,21 @@ public class CommandFragment extends ListFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (resultCode) {
-            case COMMAND_EDITED_RESULT:
-                refresh();
-                break;
-            case COMMAND_DELETED_RESULT:
-                refresh();
-                break;
+        if (requestCode == EDIT_SERVER_CODE) {
+            switch (resultCode) {
+                case SERVER_SAVED:
+                    ((MainActivity) getActivity()).refreshServers();
+                    break;
+            }
+        } else {
+            switch (resultCode) {
+                case COMMAND_EDITED_RESULT:
+                    refresh();
+                    break;
+                case COMMAND_DELETED_RESULT:
+                    refresh();
+                    break;
+            }
         }
     }
 
@@ -124,6 +138,31 @@ public class CommandFragment extends ListFragment {
             // fragment is attached to one) that an item has been selected.
 //            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.command_actions, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean result = false;
+
+        switch (item.getItemId()) {
+            case R.id.action_edit_server:
+                editServer();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void editServer() {
+        Intent intent = new Intent(getActivity(), ServerActivity.class);
+        intent.putExtra(SERVER_ID, serverId);
+        startActivityForResult(intent, EDIT_SERVER_CODE);
     }
 
     /**
