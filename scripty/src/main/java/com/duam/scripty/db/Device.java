@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.db;
 
 /**
  * Created by luispablo on 18/05/14.

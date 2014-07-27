@@ -1,7 +1,5 @@
-package com.duam.scripty;
+package com.duam.scripty.activities;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,15 +10,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.duam.scripty.db.Command;
 import com.duam.scripty.R;
+import com.duam.scripty.db.ScriptyHelper;
+import com.duam.scripty.db.Server;
+import com.duam.scripty.tasks.RunCommandTask;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
-import static com.duam.scripty.ScriptyHelper.COMMAND_ID;
-import static com.duam.scripty.ScriptyHelper.COMMAND;
+import static com.duam.scripty.db.ScriptyHelper.COMMAND_ID;
+import static com.duam.scripty.db.ScriptyHelper.COMMAND;
 
 public class CommandActionsActivity extends RoboActivity {
     public static final int EDIT_COMMAND_CODE = 10;

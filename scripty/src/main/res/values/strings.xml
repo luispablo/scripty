@@ -19,6 +19,7 @@
     <string name="run">Run</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="logout">Logout</string>
 
     <!-- Messages -->
     <string name="server_saved">Server successfully saved</string>
@@ -46,5 +47,6 @@
     <string name="run_command">Run %1$s on %2$s</string>
     <string name="running">Running command...</string>
     <string name="successfully">Executed successfully!</string>
+    <string name="logging_out">Wait while logging you out...</string>
 
 </resources>

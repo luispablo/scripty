@@ -1,6 +1,11 @@
-package com.duam.scripty;
+package com.duam.scripty.tasks;
 
 import android.content.Context;
+
+import com.duam.scripty.ScriptyService;
+import com.duam.scripty.db.Command;
+import com.duam.scripty.db.ScriptyHelper;
+import com.duam.scripty.db.Server;
 
 import java.util.List;
 

@@ -1,5 +1,8 @@
 package com.duam.scripty;
 
+import com.duam.scripty.db.Command;
+import com.duam.scripty.db.Device;
+import com.duam.scripty.db.Server;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;

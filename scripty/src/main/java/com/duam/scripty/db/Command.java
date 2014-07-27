@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.db;
 
 import java.io.Serializable;
 

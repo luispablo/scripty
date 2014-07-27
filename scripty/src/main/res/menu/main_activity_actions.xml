@@ -11,4 +11,7 @@
         android:icon="@drawable/ic_action_new"
         android:title="@string/add_server"
         scripty:showAsAction="ifRoom|withText"  />
+
+    <item android:id="@+id/action_logout"
+        android:title="@string/logout" />
 </menu>

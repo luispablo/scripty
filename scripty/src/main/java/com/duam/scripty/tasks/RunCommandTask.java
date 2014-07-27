@@ -1,7 +1,10 @@
-package com.duam.scripty;
+package com.duam.scripty.tasks;
 
 import android.content.Context;
 
+import com.duam.scripty.db.Command;
+import com.duam.scripty.db.ScriptyHelper;
+import com.duam.scripty.db.Server;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;

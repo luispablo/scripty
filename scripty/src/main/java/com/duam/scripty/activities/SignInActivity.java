@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.duam.scripty.db.Device;
+import com.duam.scripty.R;
+import com.duam.scripty.tasks.CheckValidationTask;
+import com.duam.scripty.tasks.SendValidationTask;
 
 import roboguice.activity.RoboActivity;
 import roboguice.util.Ln;

@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.duam.scripty.R;
+import com.duam.scripty.db.ScriptyHelper;
+import com.duam.scripty.db.Server;
 import com.google.inject.Inject;
 
 import roboguice.activity.RoboActivity;
@@ -18,7 +21,7 @@ import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.Utils.isEmpty;
-import static com.duam.scripty.ScriptyHelper.SERVER_ID;
+import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
 
 
 public class ServerActivity extends RoboActivity {

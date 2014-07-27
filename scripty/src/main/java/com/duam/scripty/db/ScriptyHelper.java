@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -62,6 +62,12 @@ public class ScriptyHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SERVERS_TABLE_CREATE);
         db.execSQL(COMMANDS_TABLE_CREATE);
+    }
+
+    public void deleteAllDBRecords() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(SERVERS_TABLE_NAME, null, null);
+        db.delete(COMMANDS_TABLE_NAME, null, null);
     }
 
     @Override

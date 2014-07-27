@@ -6,7 +6,7 @@
     <entry>
       <key      
         class = "com.android.navigation.ActivityState"      
-        className = "com.duam.scripty.SignInActivity">
+        className = "com.duam.scripty.activities.SignInActivity">
         <location        
           id = "point0"        
           x = "0"        
@@ -32,7 +32,7 @@
     <entry>
       <key      
         class = "com.android.navigation.ActivityState"      
-        className = "com.duam.scripty.ValidationPendingActiviy">
+        className = "com.duam.scripty.activities.ValidationPendingActiviy">
         <location        
           idref = "point0"/>
       </key>
@@ -44,7 +44,7 @@
     <entry>
       <key      
         class = "com.android.navigation.ActivityState"      
-        className = "com.duam.scripty.MainActivity">
+        className = "com.duam.scripty.activities.MainActivity">
         <location        
           idref = "point0"/>
       </key>

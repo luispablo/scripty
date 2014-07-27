@@ -12,22 +12,25 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import java.util.List;
+import com.duam.scripty.activities.CommandActionsActivity;
+import com.duam.scripty.activities.MainActivity;
+import com.duam.scripty.activities.ServerActivity;
+import com.duam.scripty.db.Command;
+import com.duam.scripty.db.ScriptyHelper;
 
 import roboguice.util.Ln;
 
-import static com.duam.scripty.ScriptyHelper.COMMAND;
-import static com.duam.scripty.ScriptyHelper.COMMAND_ID;
-import static com.duam.scripty.ScriptyHelper.COMMANDS_TABLE_NAME;
-import static com.duam.scripty.ScriptyHelper.DESCRIPTION;
-import static com.duam.scripty.ScriptyHelper.ID;
-import static com.duam.scripty.ScriptyHelper.SERVER_ID;
+import static com.duam.scripty.db.ScriptyHelper.COMMAND;
+import static com.duam.scripty.db.ScriptyHelper.COMMAND_ID;
+import static com.duam.scripty.db.ScriptyHelper.COMMANDS_TABLE_NAME;
+import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
+import static com.duam.scripty.db.ScriptyHelper.ID;
+import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
 
-import static com.duam.scripty.CommandActionsActivity.COMMAND_EDITED_RESULT;
-import static com.duam.scripty.CommandActionsActivity.COMMAND_DELETED_RESULT;
-import static com.duam.scripty.ServerActivity.EDIT_SERVER_CODE;
-import static com.duam.scripty.ServerActivity.DELETE_SERVER_CODE;
-import static com.duam.scripty.ServerActivity.SERVER_SAVED;
+import static com.duam.scripty.activities.CommandActionsActivity.COMMAND_EDITED_RESULT;
+import static com.duam.scripty.activities.CommandActionsActivity.COMMAND_DELETED_RESULT;
+import static com.duam.scripty.activities.ServerActivity.EDIT_SERVER_CODE;
+import static com.duam.scripty.activities.ServerActivity.SERVER_SAVED;
 
 /**
  * A fragment representing a list of Items.

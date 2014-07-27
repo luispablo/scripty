@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.activities;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -20,22 +20,29 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.duam.scripty.CommandFragment;
+import com.duam.scripty.R;
+import com.duam.scripty.db.ScriptyHelper;
+import com.duam.scripty.db.Server;
+import com.duam.scripty.tasks.DownloadServersTask;
+import com.duam.scripty.tasks.LogoutTask;
+
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
-import static com.duam.scripty.ScriptyHelper.DESCRIPTION;
-import static com.duam.scripty.ScriptyHelper.ID;
-import static com.duam.scripty.ScriptyHelper.SERVERS_TABLE_NAME;
-import static com.duam.scripty.ScriptyHelper.SERVER_ID;
-import static com.duam.scripty.ServerActivity.SERVER_SAVED;
-import static com.duam.scripty.CommandActivity.COMMAND_SAVED;
+import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
+import static com.duam.scripty.db.ScriptyHelper.ID;
+import static com.duam.scripty.db.ScriptyHelper.SERVERS_TABLE_NAME;
+import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
+import static com.duam.scripty.activities.ServerActivity.SERVER_SAVED;
+import static com.duam.scripty.activities.CommandActivity.COMMAND_SAVED;
 
 /**
  * Created by luispablo on 06/06/14.
  */
-public class MainActivity extends RoboActivity implements CommandFragment.OnFragmentInteractionListener{
+public class MainActivity extends RoboActivity implements CommandFragment.OnFragmentInteractionListener {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -151,9 +158,30 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             case R.id.action_add_command:
                 addCommand(currentServerId);
                 return true;
+            case R.id.action_logout:
+                logout();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void logout() {
+        new LogoutTask(this) {
+            @Override
+            protected void onPreExecute() throws Exception {
+                dialog.show();
+            }
+            @Override
+            protected void onSuccess(Void aVoid) throws Exception {
+                Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                startActivity(intent);
+            }
+            @Override
+            protected void onFinally() throws RuntimeException {
+                dialog.dismiss();
+            }
+        }.execute();
     }
 
     private void addCommand(long serverId) {

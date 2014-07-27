@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.activities;
 
 import android.app.TaskStackBuilder;
 import android.content.Intent;
@@ -11,13 +11,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.duam.scripty.db.Command;
+import com.duam.scripty.R;
+import com.duam.scripty.db.ScriptyHelper;
+import com.duam.scripty.Utils;
+
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
-import static com.duam.scripty.ScriptyHelper.SERVER_ID;
-import static com.duam.scripty.ScriptyHelper.COMMAND;
+import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
+import static com.duam.scripty.db.ScriptyHelper.COMMAND;
 
 public class CommandActivity extends RoboActivity {
     public static final int COMMAND_SAVED = 1;

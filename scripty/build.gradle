@@ -29,4 +29,5 @@ dependencies {
     compile 'org.roboguice:roboguice:3.0b-experimental'
     compile 'com.squareup.retrofit:retrofit:1.5.1'
     compile 'com.jcraft:jsch:0.1.51'
+    compile 'com.squareup.retrofit:retrofit:1.6.1'
 }

@@ -1,7 +1,9 @@
-package com.duam.scripty;
+package com.duam.scripty.tasks;
 
 import android.content.Context;
 
+import com.duam.scripty.db.Device;
+import com.duam.scripty.ScriptyService;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
