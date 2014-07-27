@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import java.util.List;
+
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyHelper.COMMAND;
@@ -24,13 +26,13 @@ import static com.duam.scripty.ScriptyHelper.SERVER_ID;
 import static com.duam.scripty.CommandActionsActivity.COMMAND_EDITED_RESULT;
 import static com.duam.scripty.CommandActionsActivity.COMMAND_DELETED_RESULT;
 import static com.duam.scripty.ServerActivity.EDIT_SERVER_CODE;
+import static com.duam.scripty.ServerActivity.DELETE_SERVER_CODE;
 import static com.duam.scripty.ServerActivity.SERVER_SAVED;
 
 /**
  * A fragment representing a list of Items.
  * <p />
  * <p />
- * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
 public class CommandFragment extends ListFragment {
@@ -77,7 +79,6 @@ public class CommandFragment extends ListFragment {
 
         setHasOptionsMenu(true);
     }
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -154,9 +155,24 @@ public class CommandFragment extends ListFragment {
             case R.id.action_edit_server:
                 editServer();
                 return true;
+            case R.id.action_delete_server:
+                deleteServer();
+                ((MainActivity) getActivity()).refreshServers();
+                refresh();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void deleteServer() {
+        ScriptyHelper helper = new ScriptyHelper(getActivity());
+
+        for (Command cmd : helper.retrieveServerCommands(serverId)) {
+            helper.deleteCommand(cmd.get_id());
+        }
+
+        helper.deleteServer(serverId);
     }
 
     private void editServer() {

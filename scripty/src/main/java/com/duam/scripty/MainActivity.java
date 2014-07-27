@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import roboguice.activity.RoboActivity;
+import roboguice.inject.InjectResource;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
@@ -44,6 +45,8 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     private static final int SERVER_FRAGMENT = 10;
     private static final int COMMAND_ACTIVITY = 20;
 
+    @InjectResource(R.string.main_title) String mainTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +65,6 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getActionBar().setTitle(getString(R.string.app_name));
             }
 
             /** Called when a drawer has settled in a completely open state. */
@@ -75,7 +77,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         mDrawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                loadCommands(id);
+                selectServer(id);
             }
         });
 
@@ -86,6 +88,18 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+    }
+
+    public void selectServer(long serverId) {
+        loadCommands(serverId);
+        setServerNameAsTitle(serverId);
+    }
+
+    private void setServerNameAsTitle(long serverId) {
+        ScriptyHelper helper = new ScriptyHelper(MainActivity.this);
+        Server server = helper.retrieveServer(serverId);
+
+        getActionBar().setTitle(String.format(mainTitle, server.getDescription()));
     }
 
     private void loadCommands(long serverId) {
@@ -176,6 +190,12 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     public void refreshServers() {
         adapter.swapCursor(serversCursor(new ScriptyHelper(this)));
         adapter.notifyDataSetChanged();
+
+        long firstServerId = adapter.getItemId(0);
+
+        if (firstServerId > 0) {
+            selectServer(firstServerId);
+        }
     }
 
     private long loadServers() {

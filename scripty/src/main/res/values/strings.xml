@@ -9,6 +9,7 @@
     <string name="email">e-mail</string>
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
     <string name="command_options_title">And now...</string>
+    <string name="main_title">Scripty for server \'%1$s\'</string>
 
     <!-- Words -->
     <string name="no">No</string>
@@ -28,7 +29,8 @@
     <string name="drawer_open">View available servers</string>
     <string name="drawer_close">Close server list</string>
     <string name="drawer_title">Available servers</string>
-    <string name="add_server">Add server</string>
+    <string name="add_server">Add new server</string>
+    <string name="delete_server">Delete current server</string>
     <string name="add_command">Add command</string>
     <string name="edit_server">Edit current server</string>
     <string name="title_activity_server">New Server</string>

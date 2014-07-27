@@ -5,4 +5,6 @@
         android:title="@string/edit_server"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_delete_server"
+        android:title="@string/delete_server" />
 </menu>

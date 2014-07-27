@@ -69,6 +69,23 @@ public class ScriptyHelper extends SQLiteOpenHelper {
 
     }
 
+    public List<Command> retrieveServerCommands(long serverId) {
+        List<Command> commands = new ArrayList<>();
+        Cursor c = getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
+
+        for (c.moveToFirst(); c.getCount() > 0 && !c.isAfterLast(); c.moveToNext()) {
+            Command cmd = new Command();
+            cmd.set_id(c.getLong(0));
+            cmd.setServerId(serverId);
+            cmd.setCommand(c.getString(2));
+            cmd.setDescription(c.getString(1));
+            commands.add(cmd);
+        }
+        c.close();
+
+        return commands;
+    }
+
     public Command retrieveCommand(long id) {
         Cursor cursor = getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND, SERVER_ID}, ID+" = ?", new String[]{String.valueOf(id)}, null, null, null);
 
@@ -126,6 +143,10 @@ public class ScriptyHelper extends SQLiteOpenHelper {
 
     public int deleteCommand(long id) {
         return getWritableDatabase().delete(COMMANDS_TABLE_NAME, ID+ " = ?", new String[]{String.valueOf(id)});
+    }
+
+    public int deleteServer(long id) {
+        return getWritableDatabase().delete(SERVERS_TABLE_NAME, ID+ " = ?", new String[]{String.valueOf(id)});
     }
 
     private ContentValues values(Server server) {

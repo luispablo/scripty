@@ -23,6 +23,7 @@ import static com.duam.scripty.ScriptyHelper.SERVER_ID;
 
 public class ServerActivity extends RoboActivity {
     public static final int EDIT_SERVER_CODE = 50;
+    public static final int DELETE_SERVER_CODE = 60;
 
     public static final int SERVER_SAVED = 1;
     public static final int ACTION_CANCELED = 2;
