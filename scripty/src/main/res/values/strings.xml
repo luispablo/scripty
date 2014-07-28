@@ -11,6 +11,11 @@
     <string name="command_options_title">And now...</string>
     <string name="main_title">Scripty for server \'%1$s\'</string>
 
+    <!-- Buttons -->
+    <string name="recheck">I\'ve already seen and validated my e-mail. Please check it</string>
+    <string name="resend_mail">Didn\'t receive the e-mail. Please re-send it.</string>
+    <string name="another_mail">Don\'t want to use that e-mail</string>
+
     <!-- Words -->
     <string name="no">No</string>
     <string name="yes">Yes</string>
@@ -48,5 +53,9 @@
     <string name="running">Running command...</string>
     <string name="successfully">Executed successfully!</string>
     <string name="logging_out">Wait while logging you out...</string>
+    <string name="validation_sent">Validation e-mail already sent to %1$s</string>
+    <string name="checking_validation">Checking device validation</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="not_validated">Validation hasn\'t been received yet.</string>
 
 </resources>

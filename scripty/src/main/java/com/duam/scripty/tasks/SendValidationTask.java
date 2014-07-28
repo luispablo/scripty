@@ -2,7 +2,12 @@ package com.duam.scripty.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.widget.Toast;
 
+import com.duam.scripty.activities.ValidationPendingActiviy;
 import com.duam.scripty.db.Device;
 import com.duam.scripty.ScriptyService;
 import com.google.gson.FieldNamingPolicy;
@@ -19,6 +24,10 @@ import retrofit.converter.GsonConverter;
 import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
 
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_KEY;
+import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.ScriptyConstants.SCRIPTY_SERVER_URL;
 
 /**
@@ -37,6 +46,23 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
     }
 
     @Override
+    protected void onPreExecute() throws Exception {
+        dialog.setMessage("Sending validation token to your e-mail...");
+        dialog.show();
+    }
+
+    @Override
+    protected void onException(Exception e) {
+        Toast.makeText(getContext(), "ERROR: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        Ln.e(e);
+    }
+
+    @Override
+    protected void onFinally() {
+        if (dialog.isShowing()) dialog.dismiss();
+    }
+
+    @Override
     public Device call() throws Exception {
         String userId = findUserId(email);
         Device device = null;
@@ -51,6 +77,27 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
         }
 
         return device;
+    }
+
+    @Override
+    protected void onSuccess(Device device) throws Exception {
+        super.onSuccess(device);
+
+        Ln.d("Storing device with id "+ device.getId() +" and key "+ device.getKey());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putLong(PREF_DEVICE_ID, device.getId());
+        editor.putString(PREF_DEVICE_KEY, device.getKey());
+        editor.putBoolean(PREF_DEVICE_CHECKED, false);
+        editor.putLong(PREF_USER_ID, device.getUserId());
+        editor.commit();
+
+        Toast.makeText(getContext(), "Validation mail sent. Please check your inbox to start using Scripty!", Toast.LENGTH_LONG).show();
+
+        Intent intent = new Intent(getContext(), ValidationPendingActiviy.class);
+        getContext().startActivity(intent);
     }
 
     private Device createDevice(String userId) throws IOException {

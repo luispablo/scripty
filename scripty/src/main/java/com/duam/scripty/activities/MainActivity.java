@@ -24,6 +24,7 @@ import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
+import com.duam.scripty.tasks.CheckValidationTask;
 import com.duam.scripty.tasks.DownloadServersTask;
 import com.duam.scripty.tasks.LogoutTask;
 
@@ -31,6 +32,8 @@ import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.util.Ln;
 
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
+import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.db.ScriptyHelper.ID;
@@ -88,13 +91,32 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             }
         });
 
-        loadServers();
-
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkValidation();
+    }
+
+    private void checkValidation() {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
+        if (prefs.contains(PREF_DEVICE_CHECKED)) {
+            Ln.d("The deviceChecked pref exists. Validation is pending, redirect...");
+            Intent intent = new Intent(this, ValidationPendingActiviy.class);
+            startActivity(intent);
+        } else {
+            Ln.d("The deviceChecked pref does not exist. Goto signin");
+            Intent intent = new Intent(this, SignInActivity.class);
+            startActivity(intent);
+        }
     }
 
     public void selectServer(long serverId) {
