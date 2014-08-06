@@ -107,7 +107,7 @@ public class CommandFragment extends ListFragment {
         if (requestCode == EDIT_SERVER_CODE) {
             switch (resultCode) {
                 case SERVER_SAVED:
-                    ((MainActivity) getActivity()).refreshServers();
+                    ((MainActivity) getActivity()).loadServers();
                     break;
             }
         } else {
@@ -160,7 +160,7 @@ public class CommandFragment extends ListFragment {
                 return true;
             case R.id.action_delete_server:
                 deleteServer();
-                ((MainActivity) getActivity()).refreshServers();
+                ((MainActivity) getActivity()).loadServers();
                 refresh();
                 return true;
             default:

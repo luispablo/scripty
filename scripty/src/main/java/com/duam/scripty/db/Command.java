@@ -5,19 +5,11 @@ import java.io.Serializable;
 /**
  * Created by lgallo on 19/05/14.
  */
-public class Command implements Serializable{
-    private long _id;
+public class Command extends RemoteModel implements Serializable{
+
     private long serverId;
     private String description;
     private String command;
-
-    public long get_id() {
-        return _id;
-    }
-
-    public void set_id(long _id) {
-        this._id = _id;
-    }
 
     public long getServerId() {
         return serverId;

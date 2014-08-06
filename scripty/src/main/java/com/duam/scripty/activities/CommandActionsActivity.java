@@ -23,6 +23,7 @@ import roboguice.util.Ln;
 
 import static com.duam.scripty.db.ScriptyHelper.COMMAND_ID;
 import static com.duam.scripty.db.ScriptyHelper.COMMAND;
+import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
 
 public class CommandActionsActivity extends RoboActivity {
     public static final int EDIT_COMMAND_CODE = 10;
@@ -86,6 +87,7 @@ public class CommandActionsActivity extends RoboActivity {
         Intent intent = new Intent(this, CommandActivity.class);
         Ln.d("Putting command with id "+ command.get_id());
         intent.putExtra(COMMAND, command);
+        intent.putExtra(SERVER_ID, server.get_id());
         startActivityForResult(intent, EDIT_COMMAND_CODE);
     }
 

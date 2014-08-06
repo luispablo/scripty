@@ -3,14 +3,28 @@ package com.duam.scripty.db;
 /**
  * Created by lgallo on 19/05/14.
  */
-public class Server {
-    private long _id;
+public class Server extends RemoteModel{
+
     private long userId;
     private String description;
     private String address;
     private int port;
     private String username;
     private String password;
+
+    @Override
+    public String toString() {
+        return "Server{" +
+                "_id=" + get_id() +
+                ", id="+ getId() +
+                ", userId=" + userId +
+                ", description='" + description + '\'' +
+                ", address='" + address + '\'' +
+                ", port=" + port +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 
     public Server() {
 
@@ -23,14 +37,6 @@ public class Server {
         this.port = port;
         this.username = username;
         this.password = password;
-    }
-
-    public long get_id() {
-        return _id;
-    }
-
-    public void set_id(long _id) {
-        this._id = _id;
     }
 
     public long getUserId() {

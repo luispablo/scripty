@@ -2,10 +2,12 @@ package com.duam.scripty.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.duam.scripty.R;
+import com.duam.scripty.activities.SignInActivity;
 import com.duam.scripty.db.ScriptyHelper;
 
 import roboguice.inject.InjectResource;
@@ -30,9 +32,14 @@ public class LogoutTask extends RoboAsyncTask<Void> {
     }
 
     @Override
+    protected void onPreExecute() throws Exception {
+        dialog.show();
+    }
+
+    @Override
     public Void call() throws Exception {
         ScriptyHelper helper = new ScriptyHelper(getContext());
-        helper.deleteAllDBRecords();
+        helper.emptyAllTables();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = prefs.edit();
@@ -42,4 +49,16 @@ public class LogoutTask extends RoboAsyncTask<Void> {
 
         return null;
     }
+
+    @Override
+    protected void onSuccess(Void aVoid) throws Exception {
+        Intent intent = new Intent(getContext(), SignInActivity.class);
+        getContext().startActivity(intent);
+    }
+
+    @Override
+    protected void onFinally() throws RuntimeException {
+        dialog.dismiss();
+    }
+
 }

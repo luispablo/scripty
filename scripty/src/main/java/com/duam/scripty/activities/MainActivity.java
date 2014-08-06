@@ -1,8 +1,10 @@
 package com.duam.scripty.activities;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,11 +19,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
+import com.duam.scripty.UploadOperationsService;
+import com.duam.scripty.Utils;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
 import com.duam.scripty.tasks.CheckValidationTask;
@@ -30,6 +36,7 @@ import com.duam.scripty.tasks.LogoutTask;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
+import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
@@ -56,6 +63,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     private static final int COMMAND_ACTIVITY = 20;
 
     @InjectResource(R.string.main_title) String mainTitle;
+    @InjectResource(R.string.no_servers) String noServers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +104,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+
+        // Trigger db sincronization.
+        UploadOperationsService.trigger(getApplicationContext());
+
+        loadServers();
     }
 
     @Override
@@ -108,10 +121,8 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     private void checkValidation() {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
-        if (prefs.contains(PREF_DEVICE_CHECKED)) {
-            Ln.d("The deviceChecked pref exists. Validation is pending, redirect...");
-            Intent intent = new Intent(this, ValidationPendingActiviy.class);
-            startActivity(intent);
+        if (prefs.getBoolean(PREF_DEVICE_CHECKED, false)) {
+            Ln.d("Everything's fine!");
         } else {
             Ln.d("The deviceChecked pref does not exist. Goto signin");
             Intent intent = new Intent(this, SignInActivity.class);
@@ -120,15 +131,22 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     }
 
     public void selectServer(long serverId) {
+        this.currentServerId = serverId;
         loadCommands(serverId);
-        setServerNameAsTitle(serverId);
+        setServerNameAsTitle();
     }
 
-    private void setServerNameAsTitle(long serverId) {
-        ScriptyHelper helper = new ScriptyHelper(MainActivity.this);
-        Server server = helper.retrieveServer(serverId);
+    private void setServerNameAsTitle() {
+        String title = "";
 
-        getActionBar().setTitle(String.format(mainTitle, server.getDescription()));
+        if (currentServerId > 0) {
+            ScriptyHelper helper = new ScriptyHelper(MainActivity.this);
+            Server server = helper.retrieveServer(currentServerId);
+            title = String.format(mainTitle, server.getDescription());
+        } else {
+            title = noServers;
+        }
+        getActionBar().setTitle(title);
     }
 
     private void loadCommands(long serverId) {
@@ -181,29 +199,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
                 addCommand(currentServerId);
                 return true;
             case R.id.action_logout:
-                logout();
+                new LogoutTask(this).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void logout() {
-        new LogoutTask(this) {
-            @Override
-            protected void onPreExecute() throws Exception {
-                dialog.show();
-            }
-            @Override
-            protected void onSuccess(Void aVoid) throws Exception {
-                Intent intent = new Intent(MainActivity.this, SignInActivity.class);
-                startActivity(intent);
-            }
-            @Override
-            protected void onFinally() throws RuntimeException {
-                dialog.dismiss();
-            }
-        }.execute();
     }
 
     private void addCommand(long serverId) {
@@ -224,7 +224,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         switch (requestCode) {
             case SERVER_FRAGMENT:
                 if (resultCode == SERVER_SAVED) {
-                    refreshServers();
+                    loadServers();
                 } else {
                     Ln.d("Not saved... :(");
                 }
@@ -237,44 +237,28 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         }
     }
 
-    public void refreshServers() {
-        adapter.swapCursor(serversCursor(new ScriptyHelper(this)));
-        adapter.notifyDataSetChanged();
+    public long loadServers() {
+        Cursor c = serversCursor(new ScriptyHelper(this));
+
+        if (adapter == null) {
+            adapter = new SimpleCursorAdapter(MainActivity.this, R.layout.drawer_list_item, c, new String[]{DESCRIPTION}, new int[] {android.R.id.text1}, 0);
+            mDrawerList.setAdapter(adapter);
+        } else {
+            adapter.swapCursor(c);
+            adapter.notifyDataSetChanged();
+        }
 
         long firstServerId = adapter.getItemId(0);
 
         if (firstServerId > 0) {
             selectServer(firstServerId);
         }
-    }
 
-    private long loadServers() {
-        ScriptyHelper helper = new ScriptyHelper(MainActivity.this);
-
-        // Si no hay servers ofrecer la descarga.
-        if (!helper.existsAnyServer()) {
-            offerServerDownload();
-            return -1;
-        }
-        else {
-            return fillDrawer(helper);
-        }
+        return firstServerId;
     }
 
     private Cursor serversCursor(ScriptyHelper helper) {
         return helper.getReadableDatabase().query(SERVERS_TABLE_NAME, new String[]{ID, DESCRIPTION}, null, null, null, null, null);
-    }
-
-    private long fillDrawer(ScriptyHelper helper) {
-        Cursor cursor = serversCursor(helper);
-        adapter = new SimpleCursorAdapter(MainActivity.this, R.layout.drawer_list_item, cursor, new String[]{DESCRIPTION}, new int[] {android.R.id.text1}, 0);
-        mDrawerList.setAdapter(adapter);
-
-        if (cursor.moveToFirst()) {
-            return cursor.getLong(0);
-        } else {
-            return -1;
-        }
     }
 
     private void offerServerDownload() {
@@ -296,7 +280,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
                     protected void onSuccess(Void aVoid) throws Exception {
                         super.onSuccess(aVoid);
 
-                        currentServerId = fillDrawer(new ScriptyHelper(MainActivity.this));
+                        currentServerId = loadServers();
                     }
                 }.execute();
             }

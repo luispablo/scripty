@@ -82,19 +82,22 @@ public class CommandActivity extends RoboActivity {
         boolean saved = false;
 
         if (fieldsValid()) {
+            ScriptyHelper helper = new ScriptyHelper(this);
+
             Ln.d("Saving command with id "+ commandId);
             Command command = new Command();
+
+            if (commandId > 0) command = helper.retrieveCommand(commandId);
+
             command.setDescription(editDescription.getText().toString());
             command.setCommand(editCommand.getText().toString());
             command.setServerId(serverId);
             command.set_id(commandId);
 
-            ScriptyHelper helper = new ScriptyHelper(this);
-
             if (command.get_id() == -1) {
                 helper.insertCommand(command);
             } else {
-                helper.updateCommad(command);
+                helper.updateCommand(command);
             }
 
             saved = true;

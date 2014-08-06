@@ -19,7 +19,9 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
+import retrofit.ErrorHandler;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import retrofit.converter.GsonConverter;
 import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
@@ -106,8 +108,14 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
                 .create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
+                .setErrorHandler(new ErrorHandler() {
+                    @Override
+                    public Throwable handleError(RetrofitError cause) {
+                        Ln.e(cause);
+                        return cause;
+                    }
+                })
                 .setEndpoint(SCRIPTY_SERVER_URL).setConverter(new GsonConverter(gson)).build();
-
         ScriptyService service = restAdapter.create(ScriptyService.class);
 
         return service.createDevice(userId, userId);

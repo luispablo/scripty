@@ -10,6 +10,7 @@
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
     <string name="command_options_title">And now...</string>
     <string name="main_title">Scripty for server \'%1$s\'</string>
+    <string name="no_servers">No servers created</string>
 
     <!-- Buttons -->
     <string name="recheck">I\'ve already seen and validated my e-mail. Please check it</string>

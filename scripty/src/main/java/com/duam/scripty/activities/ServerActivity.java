@@ -89,6 +89,11 @@ public class ServerActivity extends RoboActivity {
             long userId = prefs.getLong(PREF_USER_ID, -1);
 
             Server server = new Server();
+
+            if (serverId > 0) {
+                server = helper.retrieveServer(serverId);
+            }
+
             server.set_id(serverId);
             server.setPort(Integer.valueOf(editPort.getText().toString()));
             server.setDescription(editDescription.getText().toString());
@@ -113,8 +118,6 @@ public class ServerActivity extends RoboActivity {
             Toast.makeText(this, fixErrors, Toast.LENGTH_LONG).show();
         }
     }
-
-
 
     public boolean validate() {
         boolean isValid = true;
