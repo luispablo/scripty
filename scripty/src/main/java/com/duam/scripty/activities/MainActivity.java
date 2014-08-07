@@ -1,10 +1,8 @@
 package com.duam.scripty.activities;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,28 +17,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
-import com.duam.scripty.UploadOperationsService;
-import com.duam.scripty.Utils;
+import com.duam.scripty.services.UploadOperationsService;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
-import com.duam.scripty.tasks.CheckValidationTask;
 import com.duam.scripty.tasks.DownloadServersTask;
 import com.duam.scripty.tasks.LogoutTask;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
-import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
-import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_ID;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.db.ScriptyHelper.ID;

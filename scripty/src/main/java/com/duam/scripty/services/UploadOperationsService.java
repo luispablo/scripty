@@ -1,4 +1,4 @@
-package com.duam.scripty;
+package com.duam.scripty.services;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import com.duam.scripty.R;
+import com.duam.scripty.ScriptyException;
+import com.duam.scripty.ScriptyService;
+import com.duam.scripty.Utils;
 import com.duam.scripty.db.Command;
 import com.duam.scripty.db.Operation;
 import com.duam.scripty.db.Server;
@@ -123,13 +127,15 @@ public class UploadOperationsService extends IntentService {
         } else {
             ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
             Command cmd = helper.retrieveCommand(op.getLocalId());
+            Server server = helper.retrieveServer(cmd.getServerId());
 
-            if (cmd != null) {
+            if (cmd != null && server != null) {
                 if (op.isInsert()) {
-                    cmd.setId(service.createCommand(cmd.getServerId(), cmd.getDescription(), cmd.getCommand()).getId());
+                    cmd.setId(service.createCommand(server.getId(), cmd.getDescription(), cmd.getCommand()).getId());
                     helper.updateCommand(cmd, false);
                 } else if (op.isUpdate()) {
-                    service.updateCommand(cmd.getId(), cmd.getServerId(), cmd.getDescription(), cmd.getCommand());
+
+                    service.updateCommand(cmd.getId(), server.getId(), cmd.getDescription(), cmd.getCommand());
                 } else {
                     throw new ScriptyException(getString(R.string.op_upload_invalid_operation, op.getCode()));
                 }
