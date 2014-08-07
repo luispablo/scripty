@@ -16,6 +16,20 @@ public class Operation {
     private Code code;
     private Date createdAt;
 
+    public boolean isClass(Class clazz) {
+        return modelClass.equals(clazz.getName());
+    }
+
+    public boolean isInsert() {
+        return Code.INSERT.equals(code);
+    }
+    public boolean isUpdate() {
+        return Code.UPDATE.equals(code);
+    }
+    public boolean isDelete() {
+        return Code.DELETE.equals(code);
+    }
+
     @Override
     public String toString() {
         return code.name()+": "+modelClass+" (id "+localId+")";

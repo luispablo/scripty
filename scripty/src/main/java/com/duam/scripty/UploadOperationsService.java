@@ -1,8 +1,10 @@
 package com.duam.scripty;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
 import com.duam.scripty.db.Command;
 import com.duam.scripty.db.Operation;
@@ -42,16 +44,14 @@ public class UploadOperationsService extends IntentService {
 
             for (Operation op : operations) {
                 try {
-                    if (upload(op)) {
-                        helper.deleteOperation(op.get_id());
-                    } else {
-                        Ln.e("Danger! ERROR!");
-                        // ERROR... ???
-                        helper.deleteOperation(op.get_id());
-                        // POR AHORA LO DEJO ASÍ, PERO NO VA!
-                    }
+                    upload(op);
+                } catch (ScriptyException e) {
+                    notify(e.getMessage());
+                    Ln.e(e);
                 } catch (RetrofitError e) {
                     Ln.e(e);
+                } finally {
+                    helper.deleteOperation(op.get_id());
                 }
             }
         }
@@ -59,78 +59,84 @@ public class UploadOperationsService extends IntentService {
         Ln.d("-- Service done!");
     }
 
-    private boolean upload(Operation op) {
-        boolean result = false;
+    private void notify(String message)
+    {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(getString(R.string.upload_operations))
+                        .setContentText(message);
+
+        NotificationManager mNotificationManager = (NotificationManager)
+                getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
+    private void upload(Operation op) throws ScriptyException{
         Ln.d("Uploading operation ["+ op.toString() +"]");
 
-        if (op.getModelClass().equals(Server.class.getName())) {
-            result = uploadServer(op);
-        } else if (op.getModelClass().equals(Command.class.getName())) {
-            result = uploadCommand(op);
+        if (op.isClass(Server.class)) {
+            uploadServer(op);
+        } else if (op.isClass(Command.class)) {
+            uploadCommand(op);
         } else {
-            // ERROR!!!
+            String errorMessage = getString(R.string.op_upload_invalid_class, op.getModelClass());
+            throw new ScriptyException(errorMessage);
         }
-
-        return result;
     }
 
-    private boolean uploadServer(Operation op) {
-        boolean result = false;
-
+    private void uploadServer(Operation op) throws ScriptyException {
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
         ScriptyService service = restAdapter.create(ScriptyService.class);
-        ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
 
-        Server server = helper.retrieveServer(op.getLocalId());
-
-        if (server != null) {
-            if (Operation.Code.INSERT.equals(op.getCode())) {
-                server.setId(service.createServer(server.getUserId(),
-                        server.getDescription(), server.getAddress(),
-                        server.getPort(), server.getUsername(), server.getPassword()).getId());
-                result = helper.updateServer(server, false) == 1;
-                Ln.d("Created remote server: " + server.toString());
-            } else if (Operation.Code.UPDATE.equals(op.getCode())) {
-                service.updateServer(server.getId(), server.getUserId(), server.getDescription(),
-                        server.getAddress(), server.getPort(), server.getUsername(), server.getPassword());
-                result = true;
-            }
-        } else if (Operation.Code.DELETE.equals(op.getCode())) {
+        if (op.isDelete()) {
             service.deleteServer(op.getRemoteId());
-            result = true;
         } else {
-            // ERROR !!
-        }
+            ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
+            Server server = helper.retrieveServer(op.getLocalId());
 
-        return result;
+            if (server != null) {
+                if (op.isInsert()) {
+                    server.setId(service.createServer(server.getUserId(), server.getDescription(),
+                                server.getAddress(), server.getPort(), server.getUsername(),
+                                server.getPassword()).getId());
+                    helper.updateServer(server, false);
+                    Ln.d("Created remote server: " + server.toString());
+                } else if (op.isUpdate()) {
+                    service.updateServer(server.getId(), server.getUserId(), server.getDescription(),
+                                        server.getAddress(), server.getPort(), server.getUsername(),
+                                        server.getPassword());
+                } else {
+                    throw new ScriptyException(getString(R.string.op_upload_invalid_operation, op.getCode()));
+                }
+            } else {
+                throw new ScriptyException(getString(R.string.op_upload_not_found, op.getModelClass(), op.getLocalId()));
+            }
+        }
     }
 
-    private boolean uploadCommand(Operation op) {
-        boolean result = false;
-
+    private void uploadCommand(Operation op) throws ScriptyException{
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
         ScriptyService service = restAdapter.create(ScriptyService.class);
-        ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
 
-        Command cmd = helper.retrieveCommand(op.getLocalId());
-
-        if (cmd != null) {
-            if (Operation.Code.INSERT.equals(op.getCode())) {
-                cmd.setId(service.createCommand(cmd.getServerId(), cmd.getDescription(), cmd.getCommand()).getId());
-                helper.updateCommand(cmd, false);
-                result = true;
-            } else if (Operation.Code.UPDATE.equals(op.getCode())) {
-                service.updateCommand(cmd.getId(), cmd.getServerId(), cmd.getDescription(), cmd.getCommand());
-                result = true;
-            }
-        } else if (Operation.Code.DELETE.equals(op.getCode())) {
+        if (op.isDelete()) {
             service.deleteCommand(op.getRemoteId());
-            result = true;
         } else {
-            // ERROR !!!
-        }
+            ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
+            Command cmd = helper.retrieveCommand(op.getLocalId());
 
-        return result;
+            if (cmd != null) {
+                if (op.isInsert()) {
+                    cmd.setId(service.createCommand(cmd.getServerId(), cmd.getDescription(), cmd.getCommand()).getId());
+                    helper.updateCommand(cmd, false);
+                } else if (op.isUpdate()) {
+                    service.updateCommand(cmd.getId(), cmd.getServerId(), cmd.getDescription(), cmd.getCommand());
+                } else {
+                    throw new ScriptyException(getString(R.string.op_upload_invalid_operation, op.getCode()));
+                }
+            } else {
+                throw new ScriptyException(getString(R.string.op_upload_not_found, op.getModelClass(), op.getLocalId()));
+            }
+        }
     }
 
     public static void trigger(Context context) {
