@@ -87,6 +87,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
+                setServerNameAsTitle();
             }
 
             /** Called when a drawer has settled in a completely open state. */
