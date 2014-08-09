@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.duam.scripty.Utils;
 import com.duam.scripty.activities.ValidationPendingActiviy;
 import com.duam.scripty.db.Device;
 import com.duam.scripty.ScriptyService;
@@ -116,9 +117,8 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
                     }
                 })
                 .setEndpoint(SCRIPTY_SERVER_URL).setConverter(new GsonConverter(gson)).build();
-        ScriptyService service = restAdapter.create(ScriptyService.class);
 
-        return service.createDevice(userId, userId);
+        return Utils.scriptyService().createDevice(userId, userId);
     }
 
     private String createUser(String email) throws IOException, JSONException {
@@ -134,9 +134,7 @@ public class SendValidationTask extends RoboAsyncTask<Device> {
     }
 
     private String findUserId(String email) throws IOException, JSONException {
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
-        ScriptyService service = restAdapter.create(ScriptyService.class);
-        LinkedTreeMap response = service.findUserByEmail(email);
+        LinkedTreeMap response = Utils.scriptyService().findUserByEmail(email);
 
         if (response != null) {
             return String.valueOf(((Double) response.get("id")).intValue());

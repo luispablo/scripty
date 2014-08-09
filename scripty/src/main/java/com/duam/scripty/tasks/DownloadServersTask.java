@@ -3,6 +3,7 @@ package com.duam.scripty.tasks;
 import android.content.Context;
 
 import com.duam.scripty.ScriptyService;
+import com.duam.scripty.Utils;
 import com.duam.scripty.db.Command;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
@@ -28,8 +29,7 @@ public class DownloadServersTask extends RoboAsyncTask<Void> {
 
     @Override
     public Void call() throws Exception {
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
-        ScriptyService service = restAdapter.create(ScriptyService.class);
+        ScriptyService service = Utils.scriptyService();
 
         List<Server> servers = service.getServers(this.userId);
         Ln.d(servers.size() +" servers downloaded.");
@@ -37,13 +37,13 @@ public class DownloadServersTask extends RoboAsyncTask<Void> {
         ScriptyHelper helper = new ScriptyHelper(getContext());
 
         for (Server s : servers) {
-            helper.insertServer(s);
+            helper.insert(s);
 
             Ln.d("Querying commands from server "+ s.getDescription());
             List<Command> commands = service.getCommands(s.get_id());
             Ln.d("Found "+ commands.size() +" commands");
             for (Command cmd : commands) {
-                helper.insertCommand(cmd);
+                helper.insert(cmd);
             }
         }
         Ln.d("Servers inserted.");

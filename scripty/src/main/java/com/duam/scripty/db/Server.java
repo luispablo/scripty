@@ -1,5 +1,7 @@
 package com.duam.scripty.db;
 
+import com.duam.scripty.Utils;
+
 /**
  * Created by lgallo on 19/05/14.
  */
@@ -37,6 +39,17 @@ public class Server extends RemoteModel{
         this.port = port;
         this.username = username;
         this.password = password;
+    }
+
+    public boolean hasChanged(RemoteModel other) {
+        Server otherServer = (Server) other;
+
+        return this.userId != otherServer.getUserId()
+                || !Utils.nullSafeEquals(this.description, otherServer.getDescription())
+                || !Utils.nullSafeEquals(this.address, otherServer.getAddress())
+                || this.port != otherServer.getPort()
+                || !Utils.nullSafeEquals(this.username, otherServer.getUsername())
+                || !Utils.nullSafeEquals(this.password, otherServer.getPassword());
     }
 
     public long getUserId() {

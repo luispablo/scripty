@@ -2,9 +2,9 @@ package com.duam.scripty.tasks;
 
 import android.content.Context;
 
+import com.duam.scripty.db.Command;
 import com.duam.scripty.db.RemoteModel;
 import com.duam.scripty.db.ScriptyHelper;
-import com.duam.scripty.db.Server;
 
 import java.util.List;
 
@@ -12,22 +12,22 @@ import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
 
 /**
- * Created by luispablo on 06/08/14.
+ * Created by luispablo on 08/08/14.
  */
-public class SyncServersTask extends RoboAsyncTask<Void> {
-    private List<Server> remoteServers;
+public class SyncCommandsTask extends RoboAsyncTask<Void> {
+    private List<Command> remoteCommands;
 
-    public SyncServersTask(Context context, List<Server> servers) {
+    protected SyncCommandsTask(Context context, List<Command> remoteCommands) {
         super(context);
-        remoteServers = servers;
+        this.remoteCommands = remoteCommands;
     }
 
     @Override
     public Void call() throws Exception {
-        Ln.d("Syncing servers...");
+        Ln.d("Syncing commands...");
         ScriptyHelper helper = new ScriptyHelper(getContext());
 
-        helper.sync(remoteServers, Server.class);
+        helper.sync(remoteCommands, Command.class);
 
         return null;
     }

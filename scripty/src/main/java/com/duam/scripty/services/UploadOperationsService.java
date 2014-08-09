@@ -89,8 +89,7 @@ public class UploadOperationsService extends IntentService {
     }
 
     private void uploadServer(Operation op) throws ScriptyException {
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
-        ScriptyService service = restAdapter.create(ScriptyService.class);
+        ScriptyService service = Utils.scriptyService();
 
         if (op.isDelete()) {
             service.deleteServer(op.getRemoteId());
@@ -103,7 +102,7 @@ public class UploadOperationsService extends IntentService {
                     server.setId(service.createServer(server.getUserId(), server.getDescription(),
                                 server.getAddress(), server.getPort(), server.getUsername(),
                                 server.getPassword()).getId());
-                    helper.updateServer(server, false);
+                    helper.update(server, false);
                     Ln.d("Created remote server: " + server.toString());
                 } else if (op.isUpdate()) {
                     service.updateServer(server.getId(), server.getUserId(), server.getDescription(),
@@ -119,8 +118,7 @@ public class UploadOperationsService extends IntentService {
     }
 
     private void uploadCommand(Operation op) throws ScriptyException{
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
-        ScriptyService service = restAdapter.create(ScriptyService.class);
+        ScriptyService service = Utils.scriptyService();
 
         if (op.isDelete()) {
             service.deleteCommand(op.getRemoteId());
@@ -132,7 +130,7 @@ public class UploadOperationsService extends IntentService {
             if (cmd != null && server != null) {
                 if (op.isInsert()) {
                     cmd.setId(service.createCommand(server.getId(), cmd.getDescription(), cmd.getCommand()).getId());
-                    helper.updateCommand(cmd, false);
+                    helper.update(cmd, false);
                 } else if (op.isUpdate()) {
 
                     service.updateCommand(cmd.getId(), server.getId(), cmd.getDescription(), cmd.getCommand());

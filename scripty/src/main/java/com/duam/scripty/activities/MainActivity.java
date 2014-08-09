@@ -3,6 +3,7 @@ package com.duam.scripty.activities;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,11 +23,18 @@ import android.widget.SimpleCursorAdapter;
 
 import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
+import com.duam.scripty.db.Command;
 import com.duam.scripty.services.UploadOperationsService;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
+import com.duam.scripty.tasks.DownloadServers2Task;
 import com.duam.scripty.tasks.DownloadServersTask;
+import com.duam.scripty.tasks.DownloadUserCommandsTask;
 import com.duam.scripty.tasks.LogoutTask;
+import com.duam.scripty.tasks.SyncCommandsTask;
+import com.duam.scripty.tasks.SyncServersTask;
+
+import java.util.List;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
@@ -56,6 +64,10 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
 
     @InjectResource(R.string.main_title) String mainTitle;
     @InjectResource(R.string.no_servers) String noServers;
+    @InjectResource(R.string.sync_db_progress_title) String syncDBProgressTitle;
+    @InjectResource(R.string.sync_db_download_servers) String syncDBDownloadServers;
+    @InjectResource(R.string.sync_db_download_commands) String syncDBDownloadCommands;
+    @InjectResource(R.string.sync_db_updating_local) String syncDBUpdatingLocal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +196,9 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
 
         // Handle your other action bar items...
         switch (item.getItemId()) {
+            case R.id.action_sync_db:
+                syncDB();
+                return true;
             case R.id.action_add_server:
                 addServer();
                 return true;
@@ -196,6 +211,49 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void syncDB() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final long userId = prefs.getLong(PREF_USER_ID, -1);
+
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle(syncDBProgressTitle);
+        pd.setMessage(syncDBDownloadServers);
+        pd.show();
+
+        new DownloadServers2Task(this, userId)
+        {
+            @Override
+            protected void onSuccess(final List<Server> servers) throws Exception {
+                pd.setMessage(syncDBDownloadCommands);
+
+                new DownloadUserCommandsTask(getContext(), userId)
+                {
+                    @Override
+                    protected void onSuccess(final List<Command> commands) throws Exception {
+                        pd.setMessage(syncDBUpdatingLocal);
+
+                        new SyncServersTask(getContext(), servers)
+                        {
+                            @Override
+                            protected void onSuccess(Void aVoid) throws Exception {
+                                new SyncCommandsTask(getContext(), commands)
+                                {
+                                    @Override
+                                    protected void onSuccess(Void aVoid) throws Exception {
+                                        pd.dismiss();
+                                        loadServers();
+                                        loadCommands(currentServerId);
+                                    }
+                                }.execute();
+                            }
+                        }.execute();
+                    }
+                }.execute();
+            }
+        }.execute();
+
     }
 
     private void addCommand(long serverId) {

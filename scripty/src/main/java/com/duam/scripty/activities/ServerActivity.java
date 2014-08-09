@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.duam.scripty.R;
+import com.duam.scripty.ScriptyException;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
 import com.google.inject.Inject;
@@ -59,7 +60,12 @@ public class ServerActivity extends RoboActivity {
         btnServerOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ok();
+                try {
+                    ok();
+                } catch (ScriptyException e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
+                    Ln.e(e);
+                }
             }
         });
         btnServerCancel.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +88,7 @@ public class ServerActivity extends RoboActivity {
         }
     }
 
-    public void ok() {
+    public void ok() throws ScriptyException{
         if (validate()) {
             Ln.d("About to save server");
             ScriptyHelper helper = new ScriptyHelper(this);
@@ -104,9 +110,9 @@ public class ServerActivity extends RoboActivity {
             if (!isEmpty(editPassword)) server.setPassword(editPassword.getText().toString());
 
             if (serverId > 0) {
-                helper.updateServer(server);
+                helper.update(server);
             } else {
-                helper.insertServer(server);
+                helper.insert(server);
             }
             Ln.d("Server saved");
 

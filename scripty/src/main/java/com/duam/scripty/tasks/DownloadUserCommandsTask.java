@@ -3,11 +3,17 @@ package com.duam.scripty.tasks;
 import android.content.Context;
 
 import com.duam.scripty.ScriptyService;
+import com.duam.scripty.Utils;
 import com.duam.scripty.db.Command;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
+import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
 
 import static com.duam.scripty.ScriptyConstants.SCRIPTY_SERVER_URL;
@@ -25,9 +31,8 @@ public class DownloadUserCommandsTask extends RoboAsyncTask<List<Command>> {
 
     @Override
     public List<Command> call() throws Exception {
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(SCRIPTY_SERVER_URL).build();
-        ScriptyService service = restAdapter.create(ScriptyService.class);
+        Ln.d("Downloading user "+ userId +" commands");
 
-        return service.getUserCommands(userId);
+        return Utils.scriptyService().getUserCommands(userId);
     }
 }

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.duam.scripty.ScriptyException;
 import com.duam.scripty.db.Command;
 import com.duam.scripty.R;
 import com.duam.scripty.db.ScriptyHelper;
@@ -60,9 +61,14 @@ public class CommandActivity extends RoboActivity {
         btnCommandOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (saveCommand()) {
-                    setResult(COMMAND_SAVED);
-                    finish();
+                try {
+                    if (saveCommand()) {
+                        setResult(COMMAND_SAVED);
+                        finish();
+                    }
+                } catch (ScriptyException e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
+                    Ln.e(e);
                 }
             }
         });
@@ -78,7 +84,7 @@ public class CommandActivity extends RoboActivity {
         }
     }
 
-    private boolean saveCommand() {
+    private boolean saveCommand() throws ScriptyException {
         boolean saved = false;
 
         if (fieldsValid()) {
@@ -95,9 +101,9 @@ public class CommandActivity extends RoboActivity {
             command.set_id(commandId);
 
             if (command.get_id() == -1) {
-                helper.insertCommand(command);
+                helper.insert(command);
             } else {
-                helper.updateCommand(command);
+                helper.update(command);
             }
 
             saved = true;

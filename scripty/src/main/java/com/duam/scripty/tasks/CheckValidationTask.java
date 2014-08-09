@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 
 import com.duam.scripty.R;
+import com.duam.scripty.Utils;
 import com.duam.scripty.db.Device;
 import com.duam.scripty.ScriptyService;
 import com.google.gson.FieldNamingPolicy;
@@ -41,17 +42,8 @@ public class CheckValidationTask extends RoboAsyncTask<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
-
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(SCRIPTY_SERVER_URL).setConverter(new GsonConverter(gson)).build();
-
-        ScriptyService service = restAdapter.create(ScriptyService.class);
-
         Ln.d("Calling server to ask for device " + deviceId);
-        Device device = service.getDevice(deviceId);
+        Device device = Utils.scriptyService().getDevice(deviceId);
 
         Ln.d("Got this from the server: "+ device.describe());
         return (device != null && device.isEmailChecked());
