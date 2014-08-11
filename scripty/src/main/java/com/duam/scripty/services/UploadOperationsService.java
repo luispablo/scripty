@@ -50,7 +50,7 @@ public class UploadOperationsService extends IntentService {
                 try {
                     upload(op);
                 } catch (ScriptyException e) {
-                    notify(e.getMessage());
+                    Utils.simpleNotify(this, getString(R.string.upload_operations), e.getMessage());
                     Ln.e(e);
                 } catch (RetrofitError e) {
                     Ln.e(e);
@@ -61,18 +61,6 @@ public class UploadOperationsService extends IntentService {
         }
 
         Ln.d("-- Service done!");
-    }
-
-    private void notify(String message)
-    {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(getString(R.string.upload_operations))
-                        .setContentText(message);
-
-        NotificationManager mNotificationManager = (NotificationManager)
-                getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, mBuilder.build());
     }
 
     private void upload(Operation op) throws ScriptyException{

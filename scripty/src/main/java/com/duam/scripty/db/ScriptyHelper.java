@@ -438,11 +438,11 @@ public class ScriptyHelper extends SQLiteOpenHelper {
         List<T> locals = all(clazz);
 
         for (RemoteModel remote : remotes) {
-            remote = fixReferences(remote);
             Ln.d(" - remote ["+ remote.toString() +"]");
             T local = RemoteModel.getByRemoteId(locals, remote.getId());
 
             if (local != null) {
+                remote = fixReferences(remote);
                 Ln.d(" --- local ["+ local.toString() +"]");
                 remote.set_id(local.get_id());
                 locals.remove(local);

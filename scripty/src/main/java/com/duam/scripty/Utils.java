@@ -1,7 +1,11 @@
 package com.duam.scripty;
 
 import android.app.ActivityManager;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.v4.app.NotificationCompat;
 import android.widget.EditText;
 
 import com.google.gson.FieldNamingPolicy;
@@ -54,5 +58,28 @@ public class Utils {
                 .setEndpoint(SCRIPTY_SERVER_URL).setConverter(new GsonConverter(gson)).build();
 
         return restAdapter.create(ScriptyService.class);
+    }
+
+    public static int simpleNotify(Context context, String title, String message)
+    {
+        int id = (int) (Math.random() * 10000000);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(message);
+
+        NotificationManager mNotificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(id, mBuilder.build());
+
+        return id;
+    }
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+        return (netInfo != null && netInfo.isConnectedOrConnecting());
     }
 }

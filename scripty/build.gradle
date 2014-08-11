@@ -30,4 +30,5 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.5.1'
     compile 'com.jcraft:jsch:0.1.51'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
+    compile 'commons-lang:commons-lang:2.6'
 }

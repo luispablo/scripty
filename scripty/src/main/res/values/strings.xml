@@ -14,9 +14,7 @@
     <string name="upload_operations">Upload modifications</string>
     <string name="sync_db">Sync with server</string>
     <string name="sync_db_progress_title">Syncing local DB with server</string>
-    <string name="sync_db_download_servers">Downloading servers...</string>
-    <string name="sync_db_download_commands">Downloading commands...</string>
-    <string name="sync_db_updating_local">Updating local DB...</string>
+    <string name="sync_db_progress_message">Wait a moment please</string>
 
     <!-- Buttons -->
     <string name="recheck">I\'ve already seen and validated my e-mail. Please check it</string>

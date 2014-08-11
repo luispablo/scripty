@@ -3,7 +3,6 @@ package com.duam.scripty.activities;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,18 +22,17 @@ import android.widget.SimpleCursorAdapter;
 
 import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
-import com.duam.scripty.db.Command;
-import com.duam.scripty.services.UploadOperationsService;
+import com.duam.scripty.Utils;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
-import com.duam.scripty.tasks.DownloadServers2Task;
-import com.duam.scripty.tasks.DownloadServersTask;
-import com.duam.scripty.tasks.DownloadUserCommandsTask;
+import com.duam.scripty.services.FullDBSyncService;
+import com.duam.scripty.services.UploadOperationsService;
+import com.duam.scripty.tasks.FullDBSyncTask;
 import com.duam.scripty.tasks.LogoutTask;
-import com.duam.scripty.tasks.SyncCommandsTask;
-import com.duam.scripty.tasks.SyncServersTask;
 
-import java.util.List;
+import org.apache.commons.lang.time.DateUtils;
+
+import java.util.Date;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
@@ -42,12 +40,13 @@ import roboguice.util.Ln;
 
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
+import static com.duam.scripty.ScriptyConstants.PREF_LAST_SYNC_DB_MILLIS;
+import static com.duam.scripty.activities.CommandActivity.COMMAND_SAVED;
+import static com.duam.scripty.activities.ServerActivity.SERVER_SAVED;
 import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.db.ScriptyHelper.ID;
 import static com.duam.scripty.db.ScriptyHelper.SERVERS_TABLE_NAME;
 import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
-import static com.duam.scripty.activities.ServerActivity.SERVER_SAVED;
-import static com.duam.scripty.activities.CommandActivity.COMMAND_SAVED;
 
 /**
  * Created by luispablo on 06/06/14.
@@ -64,10 +63,6 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
 
     @InjectResource(R.string.main_title) String mainTitle;
     @InjectResource(R.string.no_servers) String noServers;
-    @InjectResource(R.string.sync_db_progress_title) String syncDBProgressTitle;
-    @InjectResource(R.string.sync_db_download_servers) String syncDBDownloadServers;
-    @InjectResource(R.string.sync_db_download_commands) String syncDBDownloadCommands;
-    @InjectResource(R.string.sync_db_updating_local) String syncDBUpdatingLocal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,43 +213,15 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final long userId = prefs.getLong(PREF_USER_ID, -1);
 
-        final ProgressDialog pd = new ProgressDialog(this);
-        pd.setTitle(syncDBProgressTitle);
-        pd.setMessage(syncDBDownloadServers);
-        pd.show();
-
-        new DownloadServers2Task(this, userId)
-        {
+        new FullDBSyncTask(this, userId) {
             @Override
-            protected void onSuccess(final List<Server> servers) throws Exception {
-                pd.setMessage(syncDBDownloadCommands);
+            protected void onFinally() throws RuntimeException {
+                super.onFinally();
 
-                new DownloadUserCommandsTask(getContext(), userId)
-                {
-                    @Override
-                    protected void onSuccess(final List<Command> commands) throws Exception {
-                        pd.setMessage(syncDBUpdatingLocal);
-
-                        new SyncServersTask(getContext(), servers)
-                        {
-                            @Override
-                            protected void onSuccess(Void aVoid) throws Exception {
-                                new SyncCommandsTask(getContext(), commands)
-                                {
-                                    @Override
-                                    protected void onSuccess(Void aVoid) throws Exception {
-                                        pd.dismiss();
-                                        loadServers();
-                                        loadCommands(currentServerId);
-                                    }
-                                }.execute();
-                            }
-                        }.execute();
-                    }
-                }.execute();
+                loadServers();
+                loadCommands(currentServerId);
             }
         }.execute();
-
     }
 
     private void addCommand(long serverId) {
@@ -303,6 +270,8 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
 
         if (firstServerId > 0) {
             selectServer(firstServerId);
+        } else {
+            offerServerDownload();
         }
 
         return firstServerId;
@@ -326,17 +295,51 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                new DownloadServersTask(MainActivity.this, prefs.getLong(PREF_USER_ID, -1)) {
+
+                new FullDBSyncTask(MainActivity.this, prefs.getLong(PREF_USER_ID, -1)) {
                     @Override
                     protected void onSuccess(Void aVoid) throws Exception {
-                        super.onSuccess(aVoid);
-
                         currentServerId = loadServers();
                     }
                 }.execute();
             }
         });
         builder.create().show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (prefs.getLong(PREF_USER_ID, -1) > 0) {
+            Date lastSyncDB = new Date(prefs.getLong(PREF_LAST_SYNC_DB_MILLIS, 0));
+            Date today = new Date();
+            Ln.d("Checking when was last sync (" + lastSyncDB + ") vs today (" + today + ")");
+
+            if (DateUtils.isSameDay(lastSyncDB, today)) {
+                Ln.d("Already synced today. Not scheduling again...");
+            } else {
+                Ln.d("Not synced today, scheduling to do it now.");
+                Intent intent = new Intent(this, FullDBSyncService.class);
+                startService(intent);
+                prefs.edit().putLong(PREF_LAST_SYNC_DB_MILLIS, today.getTime());
+                prefs.edit().commit();
+            }
+        } else {
+            Ln.d("No user logged in. Cannot schedule sync.");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (Utils.isOnline(this)) {
+            Intent intent = new Intent(this, FullDBSyncService.class);
+            startService(intent);
+        }
     }
 
     @Override
