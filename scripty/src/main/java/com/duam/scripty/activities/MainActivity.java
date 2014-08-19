@@ -3,6 +3,7 @@ package com.duam.scripty.activities;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,13 +13,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
@@ -32,8 +37,11 @@ import com.duam.scripty.tasks.LogoutTask;
 
 import org.apache.commons.lang.time.DateUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import retrofit.RetrofitError;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.util.Ln;
@@ -55,14 +63,18 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private SimpleCursorAdapter adapter;
+    private ArrayAdapter<Object> adapter;
     private long currentServerId = -1;
 
     private static final int SERVER_FRAGMENT = 10;
     private static final int COMMAND_ACTIVITY = 20;
 
+    private static final int SERVER_ITEM = 1;
+    private static final int ACTION_ITEM = 2;
+
     @InjectResource(R.string.main_title) String mainTitle;
     @InjectResource(R.string.no_servers) String noServers;
+    @InjectResource(R.string.add_server) String addServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +107,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         mDrawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectServer(id);
+                if (id > 0) {
+                    selectServer(id);
+                } else {
+                    addServer();
+                }
             }
         });
 
@@ -108,7 +124,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         // Trigger db sincronization.
         UploadOperationsService.trigger(getApplicationContext());
 
-        loadServers();
+        try {
+            loadServers();
+        } catch (IllegalAccessException | InstantiationException e) {
+            Ln.e(e);
+        }
     }
 
     @Override
@@ -195,9 +215,6 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             case R.id.action_sync_db:
                 syncDB();
                 return true;
-            case R.id.action_add_server:
-                addServer();
-                return true;
             case R.id.action_add_command:
                 addCommand(currentServerId);
                 return true;
@@ -218,7 +235,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             protected void onFinally() throws RuntimeException {
                 super.onFinally();
 
-                loadServers();
+                try {
+                    loadServers();
+                } catch (IllegalAccessException | InstantiationException e) {
+                    Ln.e(e);
+                }
                 loadCommands(currentServerId);
             }
         }.execute();
@@ -242,7 +263,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         switch (requestCode) {
             case SERVER_FRAGMENT:
                 if (resultCode == SERVER_SAVED) {
-                    loadServers();
+                    try {
+                        loadServers();
+                    } catch (IllegalAccessException | InstantiationException e) {
+                        Ln.e(e);
+                    }
                 } else {
                     Ln.d("Not saved... :(");
                 }
@@ -255,23 +280,56 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         }
     }
 
-    public long loadServers() {
-        Cursor c = serversCursor(new ScriptyHelper(this));
+    public long loadServers() throws IllegalAccessException, InstantiationException {
+        ScriptyHelper helper = new ScriptyHelper(this);
 
-        if (adapter == null) {
-            adapter = new SimpleCursorAdapter(MainActivity.this, R.layout.drawer_list_item, c, new String[]{DESCRIPTION}, new int[] {android.R.id.text1}, 0);
-            mDrawerList.setAdapter(adapter);
-        } else {
-            adapter.swapCursor(c);
-            adapter.notifyDataSetChanged();
-        }
+        List<Server> servers = helper.all(Server.class);
+
+        final List<Object> items = new ArrayList<>();
+        items.addAll(servers);
+        items.add(addServer);
+
+        adapter = new ArrayAdapter<Object>(this, R.layout.drawer_list_item, items) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                if (convertView == null) {
+                    convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
+                }
+
+                String text = (getItemViewType(position) == SERVER_ITEM) ? ((Server) getItem(position)).getDescription(): (String) getItem(position);
+                ((TextView) convertView.findViewById(R.id.txtDrawer)).setText(text);
+
+                return convertView;
+            }
+            @Override
+            public long getItemId(int position) {
+                return (getItemViewType(position) == SERVER_ITEM) ? ((Server) getItem(position)).get_id(): -1;
+            }
+            @Override
+            public int getItemViewType(int position) {
+                if (items.get(position) instanceof Server) {
+                    return SERVER_ITEM;
+                } else if (items.get(position) instanceof String) {
+                    return ACTION_ITEM;
+                } else {
+                    return -1;
+                }
+            }
+            @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+        };
+        mDrawerList.setAdapter(adapter);
 
         long firstServerId = adapter.getItemId(0);
 
-        if (firstServerId > 0) {
-            selectServer(firstServerId);
-        } else {
+        if (servers == null || servers.isEmpty()) {
             offerServerDownload();
+        } else {
+            selectServer(firstServerId);
         }
 
         return firstServerId;

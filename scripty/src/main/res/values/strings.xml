@@ -9,7 +9,7 @@
     <string name="email">e-mail</string>
     <string name="ask_download_servers">You don\'t have any servers in this device. Do you want to download them from your account?</string>
     <string name="command_options_title">And now...</string>
-    <string name="main_title">Scripty for server \'%1$s\'</string>
+    <string name="main_title">%1$s commands</string>
     <string name="no_servers">No servers created</string>
     <string name="upload_operations">Upload modifications</string>
     <string name="sync_db">Sync with server</string>
@@ -40,7 +40,7 @@
     <string name="drawer_open">View available servers</string>
     <string name="drawer_close">Close server list</string>
     <string name="drawer_title">Available servers</string>
-    <string name="add_server">Add new server</string>
+    <string name="add_server">+ Add new server</string>
     <string name="delete_server">Delete current server</string>
     <string name="add_command">Add command</string>
     <string name="edit_server">Edit current server</string>
@@ -65,5 +65,6 @@
     <string name="op_upload_invalid_class">Invalid class: %1$s</string>
     <string name="op_upload_invalid_operation">Invalid operation: %1$s</string>
     <string name="op_upload_not_found">Not found: %1$s - ID: %2$s</string>
+    <string name="scripty_server_unreachable">Scripty server is not responding. Please try again later.</string>
 
 </resources>

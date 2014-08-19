@@ -8,6 +8,7 @@ import com.duam.scripty.db.Server;
 
 import java.util.List;
 
+import retrofit.RetrofitError;
 import roboguice.util.Ln;
 
 /**
@@ -24,9 +25,9 @@ public class FullDBSyncCommand {
 
     public void execute() throws IllegalAccessException, ScriptyException, InstantiationException {
         List<Server> remoteServers = Utils.scriptyService().getServers(userId);
-        Ln.d("Got "+ remoteServers.size() +" servers for user "+ userId +".");
+        Ln.d("Got " + remoteServers.size() + " servers for user " + userId + ".");
         List<Command> remoteCommands = Utils.scriptyService().getUserCommands(userId);
-        Ln.d("Got "+ remoteCommands.size() +" commands for user "+ userId +".");
+        Ln.d("Got " + remoteCommands.size() + " commands for user " + userId + ".");
 
         ScriptyHelper helper = new ScriptyHelper(context);
 

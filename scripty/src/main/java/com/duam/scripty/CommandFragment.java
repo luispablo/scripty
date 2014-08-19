@@ -2,15 +2,19 @@ package com.duam.scripty;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.duam.scripty.activities.CommandActionsActivity;
 import com.duam.scripty.activities.MainActivity;
@@ -77,7 +81,23 @@ public class CommandFragment extends ListFragment {
         Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
         Ln.d("Found "+ cursor.getCount() +" commands");
 
-        adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.two_line_list_item, cursor, new String[]{DESCRIPTION, COMMAND}, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+        adapter = new SimpleCursorAdapter(getActivity(), R.layout.command_list_item, cursor, new String[]{DESCRIPTION, COMMAND}, new int[]{android.R.id.text1, android.R.id.text2}, 0) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                if (convertView == null) {
+                    convertView = inflater.inflate(R.layout.command_list_item, parent, false);
+                }
+
+                Cursor c = (Cursor) getItem(position);
+
+                ((TextView) convertView.findViewById(R.id.txtDescription)).setText(c.getString(c.getColumnIndexOrThrow(DESCRIPTION)));
+                ((TextView) convertView.findViewById(R.id.txtCommand)).setText(c.getString(c.getColumnIndexOrThrow(COMMAND)));
+
+                return convertView;
+            }
+        };
         setListAdapter(adapter);
 
         setHasOptionsMenu(true);
@@ -107,7 +127,11 @@ public class CommandFragment extends ListFragment {
         if (requestCode == EDIT_SERVER_CODE) {
             switch (resultCode) {
                 case SERVER_SAVED:
-                    ((MainActivity) getActivity()).loadServers();
+                    try {
+                        ((MainActivity) getActivity()).loadServers();
+                    } catch (IllegalAccessException | java.lang.InstantiationException e) {
+                        Ln.e(e);
+                    }
                     break;
             }
         } else {
@@ -160,7 +184,11 @@ public class CommandFragment extends ListFragment {
                 return true;
             case R.id.action_delete_server:
                 deleteServer();
-                ((MainActivity) getActivity()).loadServers();
+                try {
+                    ((MainActivity) getActivity()).loadServers();
+                } catch (IllegalAccessException | java.lang.InstantiationException e) {
+                    Ln.e(e);
+                }
                 refresh();
                 return true;
             default:
