@@ -1,131 +1,196 @@
 package com.duam.scripty.activities;
 
-import android.app.TaskStackBuilder;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.duam.scripty.ScriptyException;
 import com.duam.scripty.db.Command;
 import com.duam.scripty.R;
 import com.duam.scripty.db.ScriptyHelper;
-import com.duam.scripty.Utils;
+import com.duam.scripty.db.Server;
+import com.duam.scripty.tasks.RunCommandTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
-import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
+import static com.duam.scripty.db.ScriptyHelper.COMMAND_ID;
 import static com.duam.scripty.db.ScriptyHelper.COMMAND;
+import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
 
 public class CommandActivity extends RoboActivity {
-    public static final int COMMAND_SAVED = 1;
-    public static final int ACTION_CANCELED = 2;
+    public static final int EDIT_COMMAND_CODE = 10;
 
-    @InjectView(R.id.editDescription) EditText editDescription;
-    @InjectView(R.id.editCommand) EditText editCommand;
-    @InjectView(R.id.btnCommandCancel) Button btnCommandCancel;
-    @InjectView(R.id.btnCommandOK) Button btnCommandOK;
+    public static final int COMMAND_EDITED_RESULT = 100;
+    public static final int COMMAND_DELETED_RESULT = 200;
 
-    @InjectResource(R.string.field_required) String fieldRequired;
-    @InjectResource(R.string.command_saved) String commandSaved;
+    private ArrayAdapter<String> adapter;
+    private List<String> lines;
+    private List<Integer> errors;
+    private Command command;
+    private Server server;
 
-    private long serverId;
-    private long commandId = -1;
+    @InjectView(R.id.lwTerminal) ListView lwTerminal;
+    @InjectView(R.id.btnRunCommand) Button btnRunCommand;
+
+    @InjectResource(R.string.running) String running;
+    @InjectResource(R.string.successfully) String successfully;
+    @InjectResource(R.string.title_activity_command) String titleActivityCommand;
+    @InjectResource(R.string.command_exec_error) String commandExecError;
+
+    @InjectResource(R.color.terminal_error) ColorStateList terminarError;
+    @InjectResource(R.color.terminal_font) ColorStateList terminalFont;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_command);
 
-        serverId = getIntent().getLongExtra(SERVER_ID, -1);
-        Ln.d("Command for server " + serverId);
+        long id = getIntent().getLongExtra(COMMAND_ID, -1);
+        ScriptyHelper helper = new ScriptyHelper(this);
+        command = helper.retrieveCommand(id);
+        server = helper.retrieveServer(command.getServerId());
 
-        // If command given, keep its values for editing.
-        initializeValues((Command) getIntent().getSerializableExtra(COMMAND));
+        setTitle(String.format(titleActivityCommand, command.getDescription()));
 
-        btnCommandCancel.setOnClickListener(new View.OnClickListener() {
+        errors = new ArrayList<>();
+
+        lines = new ArrayList<>();
+        lines.add(buildCommandLine());
+        adapter = new ArrayAdapter<String>(this, R.layout.terminal_list_item, lines) {
             @Override
-            public void onClick(View view) {
-                setResult(ACTION_CANCELED);
-                finish();
-            }
-        });
-        btnCommandOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    if (saveCommand()) {
-                        setResult(COMMAND_SAVED);
-                        finish();
-                    }
-                } catch (ScriptyException e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
-                    Ln.e(e);
+            public View getView(int position, View convertView, ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                if (convertView == null) {
+                    convertView = inflater.inflate(R.layout.terminal_list_item, parent, false);
                 }
+                TextView txtLine = (TextView) convertView.findViewById(R.id.txtLine);
+                txtLine.setText(getItem(position));
+                txtLine.setTextColor(errors.contains(position) ? terminarError : terminalFont);
+
+                return convertView;
+            }
+        };
+
+        lwTerminal.setAdapter(adapter);
+        lwTerminal.setItemsCanFocus(false);
+
+        btnRunCommand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runCommand(command);
             }
         });
     }
 
-    private void initializeValues(Command command) {
-        if (command != null) {
-            Ln.d("Received command with id "+ command.get_id());
-            commandId = command.get_id();
-            serverId = command.getServerId();
-            editCommand.setText(command.getCommand());
-            editDescription.setText(command.getDescription());
+    private String buildCommandLine() {
+        String username = server.getUsername() != null ? server.getUsername() : "";
+        return username + "@" + server.getAddress() + ":~$ " + command.getCommand();
+    }
+
+    private void delete(Command command) {
+        ScriptyHelper helper = new ScriptyHelper(this);
+        helper.deleteCommand(command.get_id());
+        setResult(COMMAND_DELETED_RESULT);
+        finish();
+    }
+
+    private void editCommand(Command command) {
+        Intent intent = new Intent(this, NewCommandActivity.class);
+        Ln.d("Putting new_command with id "+ command.get_id());
+        intent.putExtra(COMMAND, command);
+        intent.putExtra(SERVER_ID, server.get_id());
+        startActivityForResult(intent, EDIT_COMMAND_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case EDIT_COMMAND_CODE:
+                setResult(COMMAND_EDITED_RESULT);
+                finish();
+                break;
         }
     }
 
-    private boolean saveCommand() throws ScriptyException {
-        boolean saved = false;
+    private void runCommand(Command command) {
+        final ProgressDialog pd = new ProgressDialog(this);
 
-        if (fieldsValid()) {
-            ScriptyHelper helper = new ScriptyHelper(this);
+        new RunCommandTask(this, command) {
+            protected void onPreExecute() throws Exception {
+                super.onPreExecute();
+                pd.setMessage(running);
+                pd.show();
 
-            Ln.d("Saving command with id "+ commandId);
-            Command command = new Command();
+                errors.clear();
+            }
+            @Override
+            protected void onException(Exception e) throws RuntimeException {
+                super.onException(e);
 
-            if (commandId > 0) command = helper.retrieveCommand(commandId);
+                Ln.e(e);
+                errors.add(lines.size());
+                addToTerminal(e.getMessage());
+                errors.add(lines.size());
+                addToTerminal(commandExecError);
+            }
+            @Override
+            protected void onFinally() throws RuntimeException {
+                super.onFinally();
 
-            command.setDescription(editDescription.getText().toString());
-            command.setCommand(editCommand.getText().toString());
-            command.setServerId(serverId);
-            command.set_id(commandId);
-
-            if (command.get_id() == -1) {
-                helper.insert(command);
-            } else {
-                helper.update(command);
+                if (pd.isShowing()) pd.dismiss();
+            }
+            @Override
+            protected void publishProgress(String line) {
+                if (pd.isShowing()) pd.dismiss();
+                addToTerminal(line);
             }
 
-            saved = true;
-            Toast.makeText(this, commandSaved, Toast.LENGTH_LONG).show();
-        }
+            @Override
+            protected void publishError(String line) {
+                if (pd.isShowing()) pd.dismiss();
+                if (line != null && !line.isEmpty()) errors.add(lines.size());
+                addToTerminal(line);
+            }
 
-        return saved;
+            @Override
+            protected void onSuccess(String s) throws Exception {
+                addToTerminal(s);
+            }
+        }.execute();
     }
 
-    private boolean fieldsValid() {
-        boolean isValid = true;
-
-        if (Utils.isEmpty(editDescription)) {
-            editDescription.setError(fieldRequired);
-            isValid = false;
+    private void addToTerminal(final String line) {
+        if (line != null && !line.isEmpty()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    lines.add(line);
+                    adapter.notifyDataSetChanged();
+                    lwTerminal.setSelection(adapter.getCount() - 1);
+                }
+            });
         }
-        if (Utils.isEmpty(editCommand)) {
-            editCommand.setError(fieldRequired);
-            isValid = false;
-        }
-
-        return isValid;
     }
 
     @Override
@@ -138,24 +203,14 @@ public class CommandActivity extends RoboActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                Intent upIntent = NavUtils.getParentActivityIntent(this);
-                if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
-                    // This activity is NOT part of this app's task, so create a new task
-                    // when navigating up, with a synthesized back stack.
-                    TaskStackBuilder.create(this)
-                            // Add all of this activity's parents to the back stack
-                            .addNextIntentWithParentStack(upIntent)
-                                    // Navigate up to the closest parent
-                            .startActivities();
-                } else {
-                    // This activity is part of this app's task, so simply
-                    // navigate up to the logical parent activity.
-                    NavUtils.navigateUpTo(this, upIntent);
-                }
+            case R.id.action_edit_command:
+                editCommand(command);
                 return true;
+            case R.id.action_delete_command:
+                delete(command);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 }

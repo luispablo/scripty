@@ -16,7 +16,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.duam.scripty.activities.CommandActionsActivity;
+import com.duam.scripty.activities.CommandActivity;
 import com.duam.scripty.activities.MainActivity;
 import com.duam.scripty.activities.ServerActivity;
 import com.duam.scripty.db.Command;
@@ -31,8 +31,8 @@ import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.db.ScriptyHelper.ID;
 import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
 
-import static com.duam.scripty.activities.CommandActionsActivity.COMMAND_EDITED_RESULT;
-import static com.duam.scripty.activities.CommandActionsActivity.COMMAND_DELETED_RESULT;
+import static com.duam.scripty.activities.CommandActivity.COMMAND_EDITED_RESULT;
+import static com.duam.scripty.activities.CommandActivity.COMMAND_DELETED_RESULT;
 import static com.duam.scripty.activities.ServerActivity.EDIT_SERVER_CODE;
 import static com.duam.scripty.activities.ServerActivity.SERVER_SAVED;
 
@@ -128,7 +128,7 @@ public class CommandFragment extends ListFragment {
             switch (resultCode) {
                 case SERVER_SAVED:
                     try {
-                        ((MainActivity) getActivity()).loadServers();
+                        ((MainActivity) getActivity().getParent()).loadServers();
                     } catch (IllegalAccessException | java.lang.InstantiationException e) {
                         Ln.e(e);
                     }
@@ -157,7 +157,7 @@ public class CommandFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        Intent intent = new Intent(getActivity(), CommandActionsActivity.class);
+        Intent intent = new Intent(getActivity(), CommandActivity.class);
         intent.putExtra(COMMAND_ID, id);
         startActivityForResult(intent, COMMAND_ACTIONS_CODE);
 
@@ -170,7 +170,6 @@ public class CommandFragment extends ListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.command_actions, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -185,7 +184,7 @@ public class CommandFragment extends ListFragment {
             case R.id.action_delete_server:
                 deleteServer();
                 try {
-                    ((MainActivity) getActivity()).loadServers();
+                    ((MainActivity) getActivity().getParent()).loadServers();
                 } catch (IllegalAccessException | java.lang.InstantiationException e) {
                     Ln.e(e);
                 }

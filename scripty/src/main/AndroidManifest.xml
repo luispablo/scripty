@@ -34,7 +34,7 @@
             android:theme="@style/DialogTheme" >
         </activity>
         <activity
-            android:name=".activities.CommandActivity"
+            android:name=".activities.NewCommandActivity"
             android:label="@string/title_activity_command"
             android:parentActivityName=".activities.MainActivity" >
             <meta-data
@@ -42,9 +42,12 @@
                 android:value="MainActivity" />
         </activity>
         <activity
-            android:name=".activities.CommandActionsActivity"
+            android:name=".activities.CommandActivity"
             android:label="@string/command_options_title"
-            android:theme="@style/DialogTheme">
+            android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainActivity" />
         </activity>
     </application>
 

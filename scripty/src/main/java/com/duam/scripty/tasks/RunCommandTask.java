@@ -2,6 +2,7 @@ package com.duam.scripty.tasks;
 
 import android.content.Context;
 
+import com.duam.scripty.R;
 import com.duam.scripty.db.Command;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
@@ -12,14 +13,21 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
+import roboguice.inject.InjectResource;
 import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
 
 /**
  * Created by luispablo on 24/06/14.
  */
-public class RunCommandTask extends RoboAsyncTask<String> {
+public abstract class RunCommandTask extends RoboAsyncTask<String> {
+
+    private static final int BUFFER_SIZE = 80;
+
+    @InjectResource(R.string.last_command_line) String lastCommandLine;
 
     private Command command;
 
@@ -34,8 +42,6 @@ public class RunCommandTask extends RoboAsyncTask<String> {
         ScriptyHelper helper = new ScriptyHelper(getContext());
         Server server = helper.retrieveServer(command.getServerId());
 
-        String response = null;
-
         JSch jsch = new JSch();
 
         Session session = jsch.getSession(server.getUsername(), server.getAddress());
@@ -46,38 +52,63 @@ public class RunCommandTask extends RoboAsyncTask<String> {
         ((ChannelExec)channel).setCommand(command.getCommand());
 
         channel.setInputStream(null);
-        ((ChannelExec)channel).setErrStream(System.err);
+//        ((ChannelExec)channel).setErrStream(null);
 
         InputStream in = channel.getInputStream();
+        InputStream errIn = ((ChannelExec) channel).getErrStream();
         channel.connect();
 
-        byte[] tmp = new byte[1024];
+        byte[] tmp = new byte[BUFFER_SIZE];
 
-        while(true)
-        {
-            while(in.available()>0)
-            {
-                int i=in.read(tmp, 0, 1024);
-                if(i<0)break;
+        String buffer = "";
 
-                response = new String(tmp, 0, i);
-                Ln.d("response: " + response);
-            }
-
-            if(channel.isClosed())
-            {
-                Ln.d("exit-status: "+channel.getExitStatus());
-                break;
-            }
-
-            Thread.sleep(1000);
+        for (int i = in.read(tmp, 0, BUFFER_SIZE); i > 0; i = in.read(tmp, 0, BUFFER_SIZE)) {
+            String line = new String(tmp, 0, i);
+            buffer = appendTemporalResponse(buffer, line);
+            Thread.sleep(100);
         }
+        publishProgress(buffer);
+
+        buffer = "";
+
+        for (int i = errIn.read(tmp, 0, BUFFER_SIZE); i > 0; i = errIn.read(tmp, 0, BUFFER_SIZE)) {
+            String line = new String(tmp, 0, i);
+            buffer = appendTemporalError(buffer, line);
+            Thread.sleep(100);
+        }
+        publishError(buffer);
 
         channel.disconnect();
         session.disconnect();
 
-        return response;
+        return lastCommandLine;
     }
+
+    protected String appendTemporalResponse(String buffer, String currentLine) {
+        String aux = buffer + currentLine;
+        String[] lines = aux.split("\\n");
+
+        for (int i = 0; i < lines.length - 1; i++) {
+            publishProgress(lines[i]);
+        }
+
+        return lines[lines.length - 1];
+    }
+
+    protected abstract void publishProgress(String line);
+
+    protected String appendTemporalError(String buffer, String currentLine) {
+        String aux = buffer + currentLine;
+        String[] lines = aux.split("\\n");
+
+        for (int i = 0; i < lines.length - 1; i++) {
+            publishError(lines[i]);
+        }
+
+        return lines[lines.length - 1];
+    }
+
+    protected abstract void publishError(String line);
 
     private UserInfo userInfo(final Server server) {
         return new UserInfo() {

@@ -51,11 +51,10 @@
     <string name="username">Username (optional)</string>
     <string name="password">Password (optional)</string>
     <string name="optional_credentials_hint">If you don\'t enter username and/or password, they\'ll be asked when running a command.</string>
-    <string name="title_activity_command">Command</string>
+    <string name="title_activity_command">Command \'%1$s\'</string>
     <string name="command">Command</string>
     <string name="title_activity_command_actions">CommandActionsActivity</string>
-    <string name="run_command">Run %1$s on %2$s</string>
-    <string name="running">Running command...</string>
+    <string name="running">Waiting for server</string>
     <string name="successfully">Executed successfully!</string>
     <string name="logging_out">Wait while logging you out...</string>
     <string name="validation_sent">Validation e-mail already sent to %1$s</string>
@@ -66,5 +65,9 @@
     <string name="op_upload_invalid_operation">Invalid operation: %1$s</string>
     <string name="op_upload_not_found">Not found: %1$s - ID: %2$s</string>
     <string name="scripty_server_unreachable">Scripty server is not responding. Please try again later.</string>
+    <string name="edit_command">Edit command</string>
+    <string name="delete_command">Delete command</string>
+    <string name="last_command_line">Done!</string>
+    <string name="command_exec_error">Command interrupted on error.</string>
 
 </resources>

@@ -5,6 +5,11 @@
     <color name="screen_back">#FCFCFC</color>
     <color name="drawer_divider">#EFEFEF</color>
 
+    <color name="terminal_border">#999999</color>
+    <color name="terminal_back">#335d735d</color>
+    <color name="terminal_font">#000000</color>
+    <color name="terminal_error">#ff0000</color>
+
     <color name="red">#ffff0000</color>
     <color name="light_yellow">#fffdffe9</color>
     <color name="run">#00FF00</color>

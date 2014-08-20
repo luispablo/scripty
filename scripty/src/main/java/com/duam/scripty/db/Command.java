@@ -20,7 +20,7 @@ public class Command extends RemoteModel implements Serializable{
                 ", remote_id="+ getId() +
                 ", serverId=" + serverId +
                 ", description='" + description + '\'' +
-                ", command='" + command + '\'' +
+                ", new_command='" + command + '\'' +
                 '}';
     }
 

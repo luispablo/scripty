@@ -42,9 +42,9 @@ public interface ScriptyService {
 
     @FormUrlEncoded
     @POST("/commands.json")
-    Command createCommand(@Field("command[server_id]") long serverId,
-                          @Field("command[description]") String description,
-                          @Field("command[command]") String command);
+    Command createCommand(@Field("new_command[server_id]") long serverId,
+                          @Field("new_command[description]") String description,
+                          @Field("new_command[new_command]") String command);
 
     @FormUrlEncoded
     @PUT("/servers/{id}.json")
@@ -59,9 +59,9 @@ public interface ScriptyService {
     @FormUrlEncoded
     @PUT("/commands/{id}.json")
     Command updateCommand(@Path("id") long commandId,
-                          @Field("command[server_id]") long serverId,
-                          @Field("command[description]") String description,
-                          @Field("command[command]") String command);
+                          @Field("new_command[server_id]") long serverId,
+                          @Field("new_command[description]") String description,
+                          @Field("new_command[new_command]") String command);
 
     @GET("/devices/{id}.json")
     Device getDevice(@Path("id") long deviceId);

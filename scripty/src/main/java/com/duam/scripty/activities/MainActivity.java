@@ -1,7 +1,6 @@
 package com.duam.scripty.activities;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.duam.scripty.CommandFragment;
@@ -41,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import retrofit.RetrofitError;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectResource;
 import roboguice.util.Ln;
@@ -49,7 +46,7 @@ import roboguice.util.Ln;
 import static com.duam.scripty.ScriptyConstants.PREF_DEVICE_CHECKED;
 import static com.duam.scripty.ScriptyConstants.PREF_USER_ID;
 import static com.duam.scripty.ScriptyConstants.PREF_LAST_SYNC_DB_MILLIS;
-import static com.duam.scripty.activities.CommandActivity.COMMAND_SAVED;
+import static com.duam.scripty.activities.NewCommandActivity.COMMAND_SAVED;
 import static com.duam.scripty.activities.ServerActivity.SERVER_SAVED;
 import static com.duam.scripty.db.ScriptyHelper.DESCRIPTION;
 import static com.duam.scripty.db.ScriptyHelper.ID;
@@ -172,7 +169,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     private void loadCommands(long serverId) {
         currentServerId = serverId;
 
-        Fragment fragment = CommandFragment.newInstance(serverId);
+        CommandFragment fragment = CommandFragment.newInstance(serverId);
         FragmentManager fm = getFragmentManager();
         fm.beginTransaction()
                 .replace(R.id.content_frame, fragment)
@@ -246,7 +243,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     }
 
     private void addCommand(long serverId) {
-        Intent intent = new Intent(this, CommandActivity.class);
+        Intent intent = new Intent(this, NewCommandActivity.class);
         intent.putExtra(SERVER_ID, serverId);
         startActivityForResult(intent, COMMAND_ACTIVITY);
     }
