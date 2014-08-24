@@ -38,7 +38,7 @@ public class UploadOperationsService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Ln.d("-- Service starting...");
 
-        ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
+        ScriptyHelper helper = ScriptyHelper.getInstance(getApplicationContext());
         List<Operation> operations = helper.retrieveAllOperations();
 
         if (operations.isEmpty()) {
@@ -82,7 +82,7 @@ public class UploadOperationsService extends IntentService {
         if (op.isDelete()) {
             service.deleteServer(op.getRemoteId());
         } else {
-            ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
+            ScriptyHelper helper = ScriptyHelper.getInstance(getApplicationContext());
             Server server = helper.retrieveServer(op.getLocalId());
 
             if (server != null) {
@@ -111,7 +111,7 @@ public class UploadOperationsService extends IntentService {
         if (op.isDelete()) {
             service.deleteCommand(op.getRemoteId());
         } else {
-            ScriptyHelper helper = new ScriptyHelper(getApplicationContext());
+            ScriptyHelper helper = ScriptyHelper.getInstance(getApplicationContext());
             Command cmd = helper.retrieveCommand(op.getLocalId());
             Server server = helper.retrieveServer(cmd.getServerId());
 

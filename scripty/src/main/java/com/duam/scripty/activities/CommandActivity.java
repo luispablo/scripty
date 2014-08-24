@@ -64,7 +64,7 @@ public class CommandActivity extends RoboActivity {
         setContentView(R.layout.activity_command);
 
         long id = getIntent().getLongExtra(COMMAND_ID, -1);
-        ScriptyHelper helper = new ScriptyHelper(this);
+        ScriptyHelper helper = ScriptyHelper.getInstance(this);
         command = helper.retrieveCommand(id);
         server = helper.retrieveServer(command.getServerId());
 
@@ -107,7 +107,7 @@ public class CommandActivity extends RoboActivity {
     }
 
     private void delete(Command command) {
-        ScriptyHelper helper = new ScriptyHelper(this);
+        ScriptyHelper helper = ScriptyHelper.getInstance(this);
         helper.deleteCommand(command.get_id());
         setResult(COMMAND_DELETED_RESULT);
         finish();

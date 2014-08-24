@@ -38,7 +38,7 @@ public class LogoutTask extends RoboAsyncTask<Void> {
 
     @Override
     public Void call() throws Exception {
-        ScriptyHelper helper = new ScriptyHelper(getContext());
+        ScriptyHelper helper = ScriptyHelper.getInstance(getContext());
         helper.emptyAllTables();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());

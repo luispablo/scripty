@@ -88,7 +88,7 @@ public class NewCommandActivity extends RoboActivity {
         boolean saved = false;
 
         if (fieldsValid()) {
-            ScriptyHelper helper = new ScriptyHelper(this);
+            ScriptyHelper helper = ScriptyHelper.getInstance(this);
 
             Ln.d("Saving new_command with id "+ commandId);
             Command command = new Command();

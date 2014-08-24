@@ -20,8 +20,11 @@ import roboguice.util.Ln;
  * Created by lgallo on 19/05/14.
  */
 public class ScriptyHelper extends SQLiteOpenHelper {
+
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "scripty_db";
+
+    private static ScriptyHelper helperSingleton = null;
 
     public static final String SERVERS_TABLE_NAME = "servers";
     public static final String ID = "_id";
@@ -96,7 +99,13 @@ public class ScriptyHelper extends SQLiteOpenHelper {
 
     private Context context;
 
-    public ScriptyHelper(Context context) {
+    public static ScriptyHelper getInstance(Context context) {
+        if (helperSingleton == null) helperSingleton = new ScriptyHelper(context);
+
+        return helperSingleton;
+    }
+
+    private ScriptyHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
         this.context = context;

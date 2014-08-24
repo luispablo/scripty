@@ -157,7 +157,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         String title = "";
 
         if (currentServerId > 0) {
-            ScriptyHelper helper = new ScriptyHelper(MainActivity.this);
+            ScriptyHelper helper = ScriptyHelper.getInstance(MainActivity.this);
             Server server = helper.retrieveServer(currentServerId);
             title = String.format(mainTitle, server.getDescription());
         } else {
@@ -278,7 +278,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     }
 
     public long loadServers() throws IllegalAccessException, InstantiationException {
-        ScriptyHelper helper = new ScriptyHelper(this);
+        ScriptyHelper helper = ScriptyHelper.getInstance(this);
 
         List<Server> servers = helper.all(Server.class);
 

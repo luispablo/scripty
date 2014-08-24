@@ -77,7 +77,7 @@ public class CommandFragment extends ListFragment {
         long serverId = getArguments().getLong(SERVER_ID);
         Ln.d("Loading commands from server " + serverId);
 
-        ScriptyHelper helper = new ScriptyHelper(getActivity());
+        ScriptyHelper helper = ScriptyHelper.getInstance(getActivity());
         Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
         Ln.d("Found "+ cursor.getCount() +" commands");
 
@@ -147,7 +147,7 @@ public class CommandFragment extends ListFragment {
     }
 
     private void refresh() {
-        ScriptyHelper helper = new ScriptyHelper(getActivity());
+        ScriptyHelper helper = ScriptyHelper.getInstance(getActivity());
         Cursor cursor = helper.getReadableDatabase().query(COMMANDS_TABLE_NAME, new String[]{ID, DESCRIPTION, COMMAND}, SERVER_ID+" = ?", new String[]{String.valueOf(serverId)}, null, null, null);
         adapter.swapCursor(cursor);
         adapter.notifyDataSetChanged();
@@ -196,7 +196,7 @@ public class CommandFragment extends ListFragment {
     }
 
     private void deleteServer() {
-        ScriptyHelper helper = new ScriptyHelper(getActivity());
+        ScriptyHelper helper = ScriptyHelper.getInstance(getActivity());
 
         for (Command cmd : helper.retrieveServerCommands(serverId)) {
             helper.deleteCommand(cmd.get_id());

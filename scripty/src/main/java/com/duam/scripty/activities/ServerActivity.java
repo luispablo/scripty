@@ -78,7 +78,7 @@ public class ServerActivity extends RoboActivity {
 
     private void initializeValues() {
         if (serverId > 0) {
-            ScriptyHelper helper = new ScriptyHelper(this);
+            ScriptyHelper helper = ScriptyHelper.getInstance(this);
             Server server = helper.retrieveServer(serverId);
 
             editAddress.setText(server.getAddress());
@@ -91,7 +91,7 @@ public class ServerActivity extends RoboActivity {
     public void ok() throws ScriptyException{
         if (validate()) {
             Ln.d("About to save server");
-            ScriptyHelper helper = new ScriptyHelper(this);
+            ScriptyHelper helper = ScriptyHelper.getInstance(this);
             long userId = prefs.getLong(PREF_USER_ID, -1);
 
             Server server = new Server();

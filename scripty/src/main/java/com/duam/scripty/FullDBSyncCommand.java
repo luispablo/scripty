@@ -29,7 +29,7 @@ public class FullDBSyncCommand {
         List<Command> remoteCommands = Utils.scriptyService().getUserCommands(userId);
         Ln.d("Got " + remoteCommands.size() + " commands for user " + userId + ".");
 
-        ScriptyHelper helper = new ScriptyHelper(context);
+        ScriptyHelper helper = ScriptyHelper.getInstance(context);
 
         helper.sync(remoteCommands, Command.class);
         helper.sync(remoteServers, Server.class);

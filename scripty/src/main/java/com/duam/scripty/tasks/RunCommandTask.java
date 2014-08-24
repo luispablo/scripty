@@ -39,7 +39,7 @@ public abstract class RunCommandTask extends RoboAsyncTask<String> {
 
     @Override
     public String call() throws Exception {
-        ScriptyHelper helper = new ScriptyHelper(getContext());
+        ScriptyHelper helper = ScriptyHelper.getInstance(getContext());
         Server server = helper.retrieveServer(command.getServerId());
 
         JSch jsch = new JSch();
