@@ -28,60 +28,64 @@ public abstract class RunCommandTask extends RoboAsyncTask<String> {
     private static final int BUFFER_SIZE = 80;
 
     @InjectResource(R.string.last_command_line) String lastCommandLine;
+    @InjectResource(R.string.server_without_credentials) String serverWithoutCredentials;
 
     private Command command;
+    private Server server;
 
-    public RunCommandTask(Context context, Command command) {
+    public RunCommandTask(Context context, Command command, Server server) {
         super(context);
 
         this.command = command;
+        this.server = server;
     }
 
     @Override
     public String call() throws Exception {
-        ScriptyHelper helper = ScriptyHelper.getInstance(getContext());
-        Server server = helper.retrieveServer(command.getServerId());
+        if (server.hasAuthentication()) {
+            JSch jsch = new JSch();
 
-        JSch jsch = new JSch();
+            Session session = jsch.getSession(server.getUsername(), server.getAddress());
+            session.setUserInfo(userInfo(server));
+            session.connect();
 
-        Session session = jsch.getSession(server.getUsername(), server.getAddress());
-        session.setUserInfo(userInfo(server));
-        session.connect();
+            Channel channel = session.openChannel("exec");
+            ((ChannelExec) channel).setCommand(command.getCommand());
 
-        Channel channel=session.openChannel("exec");
-        ((ChannelExec)channel).setCommand(command.getCommand());
+            channel.setInputStream(null);
 
-        channel.setInputStream(null);
-//        ((ChannelExec)channel).setErrStream(null);
+            InputStream in = channel.getInputStream();
+            InputStream errIn = ((ChannelExec) channel).getErrStream();
+            channel.connect();
 
-        InputStream in = channel.getInputStream();
-        InputStream errIn = ((ChannelExec) channel).getErrStream();
-        channel.connect();
+            byte[] tmp = new byte[BUFFER_SIZE];
 
-        byte[] tmp = new byte[BUFFER_SIZE];
+            String buffer = "";
 
-        String buffer = "";
+            for (int i = in.read(tmp, 0, BUFFER_SIZE); i > 0; i = in.read(tmp, 0, BUFFER_SIZE)) {
+                String line = new String(tmp, 0, i);
+                buffer = appendTemporalResponse(buffer, line);
+                Thread.sleep(100);
+            }
+            publishProgress(buffer);
 
-        for (int i = in.read(tmp, 0, BUFFER_SIZE); i > 0; i = in.read(tmp, 0, BUFFER_SIZE)) {
-            String line = new String(tmp, 0, i);
-            buffer = appendTemporalResponse(buffer, line);
-            Thread.sleep(100);
+            buffer = "";
+
+            for (int i = errIn.read(tmp, 0, BUFFER_SIZE); i > 0; i = errIn.read(tmp, 0, BUFFER_SIZE)) {
+                String line = new String(tmp, 0, i);
+                buffer = appendTemporalError(buffer, line);
+                Thread.sleep(100);
+            }
+            publishError(buffer);
+
+            channel.disconnect();
+            session.disconnect();
+
+            return lastCommandLine;
+        } else {
+            publishError(serverWithoutCredentials);
+            return null;
         }
-        publishProgress(buffer);
-
-        buffer = "";
-
-        for (int i = errIn.read(tmp, 0, BUFFER_SIZE); i > 0; i = errIn.read(tmp, 0, BUFFER_SIZE)) {
-            String line = new String(tmp, 0, i);
-            buffer = appendTemporalError(buffer, line);
-            Thread.sleep(100);
-        }
-        publishError(buffer);
-
-        channel.disconnect();
-        session.disconnect();
-
-        return lastCommandLine;
     }
 
     protected String appendTemporalResponse(String buffer, String currentLine) {

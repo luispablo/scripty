@@ -52,6 +52,11 @@ public class Server extends RemoteModel{
                 || !Utils.nullSafeEquals(this.password, otherServer.getPassword());
     }
 
+    public boolean hasAuthentication() {
+        return this.username != null && this.username.trim().length() > 0 &&
+                this.password != null && this.password.trim().length() > 0;
+    }
+
     public long getUserId() {
         return userId;
     }

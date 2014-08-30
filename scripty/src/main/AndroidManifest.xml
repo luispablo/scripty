@@ -10,14 +10,14 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <service android:name=".services.UploadOperationsService" />
 
         <activity
             android:name=".activities.SignInActivity"
             android:label="@string/app_name" />
-        <activity android:name=".activities.MainActivity"
-            android:label="@string/app_name">
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,10 +44,15 @@
         <activity
             android:name=".activities.CommandActivity"
             android:label="@string/command_options_title"
-            android:parentActivityName=".activities.MainActivity">
+            android:parentActivityName=".activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ServerCredentialsActivity"
+            android:label="@string/title_activity_server_credentials"
+            android:theme="@style/DialogTheme" >
         </activity>
     </application>
 

@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +36,7 @@ import static com.duam.scripty.db.ScriptyHelper.SERVER_ID;
 
 public class CommandActivity extends RoboActivity {
     public static final int EDIT_COMMAND_CODE = 10;
+    public static final int ASK_CREDENTIALS_CODE = 20;
 
     public static final int COMMAND_EDITED_RESULT = 100;
     public static final int COMMAND_DELETED_RESULT = 200;
@@ -51,9 +51,9 @@ public class CommandActivity extends RoboActivity {
     @InjectView(R.id.btnRunCommand) Button btnRunCommand;
 
     @InjectResource(R.string.running) String running;
-    @InjectResource(R.string.successfully) String successfully;
     @InjectResource(R.string.title_activity_command) String titleActivityCommand;
     @InjectResource(R.string.command_exec_error) String commandExecError;
+    @InjectResource(R.string.server_without_credentials) String serverWithoutCredentials;
 
     @InjectResource(R.color.terminal_error) ColorStateList terminarError;
     @InjectResource(R.color.terminal_font) ColorStateList terminalFont;
@@ -96,7 +96,11 @@ public class CommandActivity extends RoboActivity {
         btnRunCommand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                runCommand(command);
+                if (server.hasAuthentication()) {
+                    runCommand(command, server);
+                } else {
+                    askServerCredentials(command);
+                }
             }
         });
     }
@@ -130,13 +134,22 @@ public class CommandActivity extends RoboActivity {
                 setResult(COMMAND_EDITED_RESULT);
                 finish();
                 break;
+            case ASK_CREDENTIALS_CODE:
+                if (resultCode == ServerCredentialsActivity.OK) {
+                    server.setUsername(data.getCharSequenceExtra(ServerCredentialsActivity.USERNAME).toString());
+                    server.setPassword(data.getCharSequenceExtra(ServerCredentialsActivity.PASSWORD).toString());
+                    runCommand(command, server);
+                } else {
+                    Toast.makeText(this, serverWithoutCredentials, Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
 
-    private void runCommand(Command command) {
+    private void runCommand(Command command, Server server) {
         final ProgressDialog pd = new ProgressDialog(this);
 
-        new RunCommandTask(this, command) {
+        new RunCommandTask(this, command, server) {
             protected void onPreExecute() throws Exception {
                 super.onPreExecute();
                 pd.setMessage(running);
@@ -178,6 +191,17 @@ public class CommandActivity extends RoboActivity {
                 addToTerminal(s);
             }
         }.execute();
+    }
+
+    private void askServerCredentials(Command cmd) {
+        ScriptyHelper helper = ScriptyHelper.getInstance(this);
+        Server server = helper.retrieveServer(cmd.getServerId());
+
+        if (!server.hasAuthentication()) {
+            Intent intent = new Intent(this, ServerCredentialsActivity.class);
+            intent.putExtra(ServerCredentialsActivity.SERVER_ID, server.get_id());
+            startActivityForResult(intent, ASK_CREDENTIALS_CODE);
+        }
     }
 
     private void addToTerminal(final String line) {
