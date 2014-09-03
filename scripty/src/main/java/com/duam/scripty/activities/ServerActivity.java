@@ -85,6 +85,8 @@ public class ServerActivity extends RoboActivity {
             editDescription.setText(server.getDescription());
             editPort.setText(String.valueOf(server.getPort()));
             editUsername.setText(server.getUsername());
+        } else {
+            editPort.setText("22");
         }
     }
 
