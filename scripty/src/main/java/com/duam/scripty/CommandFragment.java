@@ -128,7 +128,7 @@ public class CommandFragment extends ListFragment {
             switch (resultCode) {
                 case SERVER_SAVED:
                     try {
-                        ((MainActivity) getActivity().getParent()).loadServers();
+                        ((MainActivity) getActivity()).loadServers();
                     } catch (IllegalAccessException | java.lang.InstantiationException e) {
                         Ln.e(e);
                     }
