@@ -75,6 +75,9 @@ public interface ScriptyService {
     @GET("/users/{id}/commands.json")
     List<Command> getUserCommands(@Path("id") long userId);
 
+    @GET("/devices/{id}/validate/{key}.json")
+    Device validateDevice(@Path("id") long deviceId, @Path("key") String key);
+
     @DELETE("/servers/{id}.json")
     String deleteServer(@Path("id") long serverId);
 

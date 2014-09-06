@@ -2,12 +2,14 @@ package com.duam.scripty.activities;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -22,9 +24,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.duam.scripty.CommandFragment;
 import com.duam.scripty.R;
+import com.duam.scripty.ScriptyException;
 import com.duam.scripty.Utils;
 import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
@@ -32,6 +36,7 @@ import com.duam.scripty.services.FullDBSyncService;
 import com.duam.scripty.services.UploadOperationsService;
 import com.duam.scripty.tasks.FullDBSyncTask;
 import com.duam.scripty.tasks.LogoutTask;
+import com.duam.scripty.tasks.ValidateDeviceTask;
 
 import org.apache.commons.lang.time.DateUtils;
 
@@ -72,6 +77,8 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     @InjectResource(R.string.main_title) String mainTitle;
     @InjectResource(R.string.no_servers) String noServers;
     @InjectResource(R.string.add_server) String addServer;
+    @InjectResource(R.string.validate_device_title) String validateDeviceTitle;
+    @InjectResource(R.string.validate_device_message) String validateDeviceMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +139,48 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     protected void onResume() {
         super.onResume();
 
-        checkValidation();
+        Uri data = getIntent().getData();
+
+        if (data != null) {
+            validateDevice(data);
+        } else {
+            checkValidation();
+        }
+    }
+
+    private void validateDevice(Uri data) {
+        List<String> params = data.getPathSegments();
+        long deviceId = Long.parseLong(params.get(1));
+        String key = params.get(3);
+
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle(validateDeviceTitle);
+        pd.setMessage(validateDeviceMessage);
+
+        new ValidateDeviceTask(this, deviceId, key) {
+            @Override
+            protected void onPreExecute() throws Exception {
+                pd.show();
+            }
+            @Override
+            protected void onException(Exception e) throws RuntimeException {
+                Toast.makeText(MainActivity.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                startActivity(intent);
+
+                if (!(e instanceof ScriptyException)) Ln.e(e);
+            }
+            @Override
+            protected void onSuccess(Void aVoid) throws Exception {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                editor.putBoolean(PREF_DEVICE_CHECKED, true);
+                editor.commit();
+            }
+            @Override
+            protected void onFinally() throws RuntimeException {
+                pd.dismiss();
+            }
+        }.execute();
     }
 
     private void checkValidation() {

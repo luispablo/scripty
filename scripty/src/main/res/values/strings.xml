@@ -15,6 +15,8 @@
     <string name="sync_db">Sync with server</string>
     <string name="sync_db_progress_title">Syncing local DB with server</string>
     <string name="sync_db_progress_message">Wait a moment please</string>
+    <string name="validate_device_title">Validating device</string>
+    <string name="validate_device_message">Wait a moment please</string>
 
     <!-- Buttons -->
     <string name="recheck">I\'ve already seen and validated my e-mail. Please check it</string>
@@ -71,5 +73,6 @@
     <string name="command_exec_error">Command interrupted on error.</string>
     <string name="title_activity_server_credentials">Server credentials</string>
     <string name="server_without_credentials">No username or password to connect to server</string>
+    <string name="wrong_device_id_key">The link you pressed wasn\'t generated for this device.</string>
 
 </resources>
