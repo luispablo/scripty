@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="main_button">#0000FF</color>
     <color name="button">#DDDDDD</color>
-    <color name="screen_back">#FCFCFC</color>
     <color name="drawer_divider">#EFEFEF</color>
 
     <color name="terminal_border">#999999</color>
