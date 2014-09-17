@@ -266,6 +266,10 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             case R.id.action_logout:
                 new LogoutTask(this).execute();
                 return true;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

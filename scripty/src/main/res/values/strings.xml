@@ -32,6 +32,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
 
     <!-- Messages -->
     <string name="server_saved">Server successfully saved</string>
@@ -74,5 +75,8 @@
     <string name="title_activity_server_credentials">Server credentials</string>
     <string name="server_without_credentials">No username or password to connect to server</string>
     <string name="wrong_device_id_key">The link you pressed wasn\'t generated for this device.</string>
+    <string name="account_email">e-mail address</string>
+    <string name="account_info">Account information</string>
+    <string name="title_activity_settings">Settings</string>
 
 </resources>
