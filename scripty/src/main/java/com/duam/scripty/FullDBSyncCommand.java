@@ -31,8 +31,8 @@ public class FullDBSyncCommand {
 
         ScriptyHelper helper = ScriptyHelper.getInstance(context);
 
-        helper.sync(remoteCommands, Command.class);
         helper.sync(remoteServers, Server.class);
+        helper.sync(remoteCommands, Command.class);
     }
 
 }

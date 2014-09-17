@@ -464,6 +464,8 @@ public class ScriptyHelper extends SQLiteOpenHelper {
                 }
             } else {
                 Ln.d(" --- has no local match, INSERT.");
+                remote = fixReferences(remote);
+                Ln.d(" - remote with references FIXED ["+ remote.toString() +"]");
                 insert(remote, false);
             }
         }
