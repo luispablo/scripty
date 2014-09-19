@@ -78,5 +78,7 @@
     <string name="account_email">e-mail address</string>
     <string name="account_info">Account information</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="commands_settings">Commands Settings</string>
+    <string name="command_timeout">Timeout (in seconds)</string>
 
 </resources>

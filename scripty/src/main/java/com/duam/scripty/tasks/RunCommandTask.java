@@ -1,10 +1,10 @@
 package com.duam.scripty.tasks;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 
 import com.duam.scripty.R;
 import com.duam.scripty.db.Command;
-import com.duam.scripty.db.ScriptyHelper;
 import com.duam.scripty.db.Server;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -13,12 +13,12 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 
 import roboguice.inject.InjectResource;
-import roboguice.util.Ln;
 import roboguice.util.RoboAsyncTask;
+
+import static com.duam.scripty.ScriptyConstants.DEFAULT_TIMEOUT_SECONDS;
+import static com.duam.scripty.ScriptyConstants.PREF_TIMEOUT_SECOND;
 
 /**
  * Created by luispablo on 24/06/14.
@@ -45,8 +45,12 @@ public abstract class RunCommandTask extends RoboAsyncTask<String> {
         if (server.hasAuthentication()) {
             JSch jsch = new JSch();
 
+            int timeout = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getContext())
+                    .getString(PREF_TIMEOUT_SECOND, String.valueOf(DEFAULT_TIMEOUT_SECONDS)));
+
             Session session = jsch.getSession(server.getUsername(), server.getAddress());
             session.setUserInfo(userInfo(server));
+            session.setTimeout(timeout * 1000);
             session.connect();
 
             Channel channel = session.openChannel("exec");

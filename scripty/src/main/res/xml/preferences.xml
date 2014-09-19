@@ -6,4 +6,11 @@
             android:title="@string/account_email"
             android:selectable="false" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/commands_settings">
+        <EditTextPreference
+            android:key="timeoutSeconds"
+            android:title="@string/command_timeout"
+            android:inputType="number" />
+    </PreferenceCategory>
 </PreferenceScreen>

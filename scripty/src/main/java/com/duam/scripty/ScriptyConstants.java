@@ -15,4 +15,7 @@ public class ScriptyConstants {
     public static final String PREF_USER_ID = "userId";
     public static final String PREF_USER_EMAIL = "userEmail";
     public static final String PREF_LAST_SYNC_DB_MILLIS = "lastSyncDBMillis";
+    public static final String PREF_TIMEOUT_SECOND = "timeoutSeconds";
+
+    public static final int DEFAULT_TIMEOUT_SECONDS = 60;
 }
