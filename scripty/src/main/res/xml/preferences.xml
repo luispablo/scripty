@@ -13,4 +13,11 @@
             android:title="@string/command_timeout"
             android:inputType="number" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/app_info">
+        <EditTextPreference
+            android:key="appVersion"
+            android:title="@string/app_version"
+            android:selectable="false" />
+    </PreferenceCategory>
 </PreferenceScreen>
