@@ -207,7 +207,12 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         if (currentServerId > 0) {
             ScriptyHelper helper = ScriptyHelper.getInstance(MainActivity.this);
             Server server = helper.retrieveServer(currentServerId);
-            title = String.format(mainTitle, server.getDescription());
+
+            if (server != null) {
+                title = String.format(mainTitle, server.getDescription());
+            } else {
+                title = noServers;
+            }
         } else {
             title = noServers;
         }
