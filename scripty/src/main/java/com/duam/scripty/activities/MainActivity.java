@@ -67,6 +67,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
     private ActionBarDrawerToggle mDrawerToggle;
     private ArrayAdapter<Object> adapter;
     private long currentServerId = -1;
+    private boolean alreadyOfferedDownload = false;
 
     private static final int SERVER_FRAGMENT = 10;
     private static final int COMMAND_ACTIVITY = 20;
@@ -393,7 +394,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         long firstServerId = adapter.getItemId(0);
 
         if (servers == null || servers.isEmpty()) {
-            offerServerDownload();
+            if (!alreadyOfferedDownload) offerServerDownload();
         } else {
             selectServer(firstServerId);
         }
@@ -429,6 +430,7 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             }
         });
         builder.create().show();
+        alreadyOfferedDownload = true;
     }
 
     @Override
