@@ -184,7 +184,8 @@ public class CommandFragment extends ListFragment {
             case R.id.action_delete_server:
                 deleteServer();
                 try {
-                    ((MainActivity) getActivity().getParent()).loadServers();
+                    ((MainActivity) getActivity()).loadServers();
+                    ((MainActivity) getActivity()).invalidateOptionsMenu();
                 } catch (IllegalAccessException | java.lang.InstantiationException e) {
                     Ln.e(e);
                 }

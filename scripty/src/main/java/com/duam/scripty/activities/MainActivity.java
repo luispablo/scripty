@@ -201,22 +201,23 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         setServerNameAsTitle();
     }
 
-    private void setServerNameAsTitle() {
-        String title = "";
-
+    private Server currentServer() {
         if (currentServerId > 0) {
             ScriptyHelper helper = ScriptyHelper.getInstance(MainActivity.this);
-            Server server = helper.retrieveServer(currentServerId);
-
-            if (server != null) {
-                title = String.format(mainTitle, server.getDescription());
-            } else {
-                title = noServers;
-            }
+            return helper.retrieveServer(currentServerId);
         } else {
-            title = noServers;
+            return null;
         }
-        getActionBar().setTitle(title);
+    }
+
+    private void setServerNameAsTitle() {
+        Server currentServer = currentServer();
+
+        if (currentServer != null) {
+            getActionBar().setTitle(String.format(mainTitle, currentServer.getDescription()));
+        } else {
+            getActionBar().setTitle(noServers);
+        }
     }
 
     private void loadCommands(long serverId) {
@@ -236,6 +237,13 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_actions, menu);
+
+        Server currentServer = currentServer();
+
+        ((MenuItem) menu.findItem(R.id.action_add_command)).setVisible(currentServer != null);
+        ((MenuItem) menu.findItem(R.id.action_edit_server)).setVisible(currentServer != null);
+        ((MenuItem) menu.findItem(R.id.action_delete_server)).setVisible(currentServer != null);
+
         return super.onCreateOptionsMenu(menu);
     }
 
