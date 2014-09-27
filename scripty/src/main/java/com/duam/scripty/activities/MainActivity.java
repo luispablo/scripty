@@ -381,7 +381,11 @@ public class MainActivity extends RoboActivity implements CommandFragment.OnFrag
             }
             @Override
             public int getViewTypeCount() {
-                return 2;
+                if (currentServer() != null) {
+                    return 2;
+                } else {
+                    return 1;
+                }
             }
         };
         mDrawerList.setAdapter(adapter);
