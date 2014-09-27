@@ -4,7 +4,7 @@ package com.duam.scripty;
  * Created by luispablo on 11/05/14.
  */
 public class ScriptyConstants {
-    public static final String APP_VERSION = "v0.1";
+    public static final String APP_VERSION = "v0.2";
 
     public static final String SCRIPTY_SERVER_URL = "http://scripty.duamsistemas.com.ar";
     public static final String FIND_USER_URI = "/users/find.json";
